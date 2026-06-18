@@ -56,7 +56,7 @@ class NanoGPTImageGenProvider(ImageGenProvider):
             logger.exception("Failed to parse image-models response: %s", decode_error)
             return models
 
-        # Response shape: {"object": "list", "data": [<model>, ...], "meta": {...}}
+        # Response shape: {"object": "list", "data": [{model}, ...], "meta": {...}}
         entries = payload.get("data") if isinstance(payload, dict) else None
         if not isinstance(entries, list):
             logger.warning(
@@ -95,13 +95,13 @@ class NanoGPTImageGenProvider(ImageGenProvider):
         return {}
 
     @staticmethod
-    def __to_model_picker_entry(model):
+    def __to_model_picker_entry(model) -> Dict[str, Any]:
         return {
             "id": model["id"],
             "display": model["name"],
             "speed": "varies",
             "strengths": model["description"],
-            "price": "varies"
+            "price": f'{sum(model["pricing"]["per_image"].values()) / len(model["pricing"]["per_image"])} USD (avg.)',
         }
 
     @property
