@@ -2,6 +2,7 @@
 
 API documentation: https://docs.nano-gpt.com/api-reference/image-generation
 """
+import json
 import logging
 import os
 from typing import Dict, Any, List, Optional
@@ -72,8 +73,8 @@ _DEFAULT_MODEL = "chroma"
 # Provider
 # --------
 
-class NanoGPTImageGenProvider(ImageGenProvider):
 
+class NanoGPTImageGenProvider(ImageGenProvider):
     @property
     def name(self) -> str:
         return "nanogpt"
@@ -86,7 +87,27 @@ class NanoGPTImageGenProvider(ImageGenProvider):
         return bool(os.environ.get("NANOGPT_API_KEY", False))
 
     def list_models(self) -> List[Dict[str, Any]]:
-        return super().list_models()
+        from urllib.request import Request, urlopen
+
+        request: Request = Request(
+            url=f"{BASE_URL}/image-models?detailed=true",
+            headers={
+                "User-Agent": "nanogpt-hermes-plugin",
+                "Content-Type": "application/json",
+            },
+            method="GET",
+        )
+
+        with urlopen(request) as response:
+            raw_data = response.read().decode("utf-8")
+            json_data = json.loads(raw_data)
+            models = json_data.get("data") if isinstance(json_data, dict) else None
+
+        return [
+            {
+                "id": model.get("id"),
+            } for model in models
+        ]
 
     def get_setup_schema(self) -> Dict[str, Any]:
         return {
@@ -98,7 +119,7 @@ class NanoGPTImageGenProvider(ImageGenProvider):
                     "prompt": "NanoGPT API key",
                     "url": "https://nano-gpt.com/api",
                 }
-            ]
+            ],
         }
 
     def default_model(self) -> Optional[str]:
@@ -107,13 +128,22 @@ class NanoGPTImageGenProvider(ImageGenProvider):
     def capabilities(self) -> Dict[str, Any]:
         return super().capabilities()
 
-    def generate(self, prompt: str, aspect_ratio: str = DEFAULT_ASPECT_RATIO, *, image_url: Optional[str] = None,
-                 reference_image_urls: Optional[List[str]] = None, **kwargs: Any) -> Dict[str, Any]:
+    def generate(
+        self,
+        prompt: str,
+        aspect_ratio: str = DEFAULT_ASPECT_RATIO,
+        *,
+        image_url: Optional[str] = None,
+        reference_image_urls: Optional[List[str]] = None,
+        **kwargs: Any,
+    ) -> Dict[str, Any]:
         pass
+
 
 # -----------------
 # Plugin entrypoint
 # -----------------
+
 
 def register(ctx) -> None:
     ctx.register_image_gen_provider(NanoGPTImageGenProvider())
