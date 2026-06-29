@@ -17,5 +17,5 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
-    "hermes-agent==0.16.0",
+    "hermes-agent==0.17.0",
 ]

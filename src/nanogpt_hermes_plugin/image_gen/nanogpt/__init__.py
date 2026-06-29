@@ -1,18 +1,76 @@
-"""NanoGPT image generation plugin"""
-import json
+"""NanoGPT image generation backend.
+
+API documentation: https://docs.nano-gpt.com/api-reference/image-generation
+"""
 import logging
 import os
-from urllib.error import URLError, HTTPError
-from urllib.request import urlopen, Request
-from typing import Any, Dict, List
+from typing import Dict, Any, List, Optional
 
-from agent.image_gen_provider import ImageGenProvider, DEFAULT_ASPECT_RATIO, error_response, success_response
+from agent.image_gen_provider import ImageGenProvider, DEFAULT_ASPECT_RATIO
 
 logger = logging.getLogger(__name__)
 
-BASE_URL = "https://nano-gpt.com/api/v1"
-DEFAULT_MODEL = "hidream"
+# ---------
+# Constants
+# ---------
 
+BASE_URL = "https://nano-gpt.com/api/v1"
+
+# ---------------------
+# Default model catalog
+# ---------------------
+
+# We included the subscription models as default models since the image generation is free for subscriber plan.
+# Last update: 2026-06-29
+
+_MODELS: Dict[str, Dict[str, Any]] = {
+    # Reference: https://nano-gpt.com/models/image/chroma
+    "chroma": {
+        "id": "chroma",
+        "display": "Chroma",
+        "strengths": "Uncensored text-to-image model. Supports custom resolution up to 1536x1536.",
+        "price": "0.025 USD per image",
+        "modality": "text->image",
+    },
+    # Reference: https://nano-gpt.com/models/image/hidream
+    "hidream": {
+        "id": "hidream",
+        "display": "Hidream",
+        "strengths": "Hidream I1 Full, the latest and greatest image generation model from Hidream.",
+        "price": "0.015 USD per image",
+        "modality": "text->image",
+    },
+    # Reference: https://nano-gpt.com/models/image/qwen-image
+    "qwen-image": {
+        "id": "qwen-image",
+        "display": "Qwen Image",
+        "strengths": "Latest release (v2509, 25-09). Qwen-Image is an image generation foundation model that excels at complex text rendering and precise image editing, with support for multi-image editing.",
+        "price": "0.020 USD per image",
+        "modality": "text+image->image",
+    },
+    # Reference: https://nano-gpt.com/models/image/step-image-edit-2
+    "step-image-edit-2": {
+        "id": "step-image-edit-2",
+        "display": "Step Image Edit 2",
+        "strengths": "A lightweight image generation and editing model for fast text-to-image and prompt-guided image edits. Supports single-image edits and returns edited images at the input image size. Prompts are limited to 512 characters; negative prompts have the same limit.",
+        "price": "0.003 USD per image",
+        "modality": "text+image->image",
+    },
+    # Reference: https://nano-gpt.com/models/image/z-image-turbo
+    "z-image-turbo": {
+        "id": "z-image-turbo",
+        "display": "Z Image Turbo",
+        "strengths": "Z Image Turbo is a fast, high-quality image generation model optimized for speed. Generate detailed images with cinematic quality, film grain effects, and artistic styles.",
+        "price": "0.012 USD per image",
+        "modality": "text->image",
+    },
+}
+
+_DEFAULT_MODEL = "chroma"
+
+# --------
+# Provider
+# --------
 
 class NanoGPTImageGenProvider(ImageGenProvider):
 
@@ -25,85 +83,37 @@ class NanoGPTImageGenProvider(ImageGenProvider):
         return "NanoGPT"
 
     def is_available(self) -> bool:
-        return True if self.__api_key else False
+        return bool(os.environ.get("NANOGPT_API_KEY", False))
 
     def list_models(self) -> List[Dict[str, Any]]:
-        request: Request = Request(
-            f"{BASE_URL}/image-models?detailed=true",
-            headers={
-                "Authorization": f"Bearer {self.__api_key}",
-                "Content-Type": "application/json",
-            },
-            method="GET",
-        )
-        models = []
+        return super().list_models()
 
-        try:
-            with urlopen(request) as response:
-                data = response.read()
-        except HTTPError as http_error:
-            logger.exception(
-                "The server could not fulfill the request. Error code: %s", http_error.code
-            )
-            return models
-        except URLError as url_error:
-            logger.exception("The server could not be reached. Reason: %s", url_error.reason)
-            return models
-
-        try:
-            payload = json.loads(data)
-        except json.JSONDecodeError as decode_error:
-            logger.exception("Failed to parse image-models response: %s", decode_error)
-            return models
-
-        # Response shape: {"object": "list", "data": [{model}, ...], "meta": {...}}
-        entries = payload.get("data") if isinstance(payload, dict) else None
-        if not isinstance(entries, list):
-            logger.warning(
-                "Unexpected payload shape: top-level=%s",
-                type(payload).__name__,
-            )
-            return models
-
-        for entry in entries:
-            if not isinstance(entry, dict) or "id" not in entry:
-                continue
-            # Defensive filter: the /image-models endpoint should already be image-only,
-            # but trust capabilities over the endpoint name in case that ever changes.
-            if not entry.get("capabilities", {}).get("image_generation"):
-                continue
-
-            models.append(entry)
-
-
-        MODELS = [self.__to_model_picker_entry(model) for model in models]
-        logger.debug("Loaded %d image generation models from NanoGPT", len(MODELS))
-
-        return MODELS
-
-    def generate(self, prompt: str, aspect_ratio: str = DEFAULT_ASPECT_RATIO, **kwargs: Any) -> Dict[str, Any]:
-        if not prompt:
-            return error_response(
-                error="Prompt is required",
-                error_type="invalid_input",
-                provider=self.name,
-                prompt="",
-                aspect_ratio=aspect_ratio,
-            )
-
-        # TODO Actually implement the generate image logic
-        return {}
-
-    @staticmethod
-    def __to_model_picker_entry(model) -> Dict[str, Any]:
+    def get_setup_schema(self) -> Dict[str, Any]:
         return {
-            "id": model["id"],
-            "display": model["name"],
-            "speed": "varies",
-            "strengths": model["description"],
-            "price": f'{sum(model["pricing"]["per_image"].values()) / len(model["pricing"]["per_image"])} USD (avg.)',
+            "name": "NanoGPT",
+            "badge": "paid",
+            "env_vars": [
+                {
+                    "key": "NANOGPT_API_KEY",
+                    "prompt": "NanoGPT API key",
+                    "url": "https://nano-gpt.com/api",
+                }
+            ]
         }
 
-    @property
-    def __api_key(self):
-        return os.environ.get("NANOGPT_API_KEY")
+    def default_model(self) -> Optional[str]:
+        return _DEFAULT_MODEL
+
+    def capabilities(self) -> Dict[str, Any]:
+        return super().capabilities()
+
+    def generate(self, prompt: str, aspect_ratio: str = DEFAULT_ASPECT_RATIO, *, image_url: Optional[str] = None,
+                 reference_image_urls: Optional[List[str]] = None, **kwargs: Any) -> Dict[str, Any]:
+        pass
+
+# -----------------
+# Plugin entrypoint
+# -----------------
+
+def register(ctx) -> None:
+    ctx.register_image_gen_provider(NanoGPTImageGenProvider())
