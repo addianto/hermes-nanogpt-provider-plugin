@@ -274,7 +274,6 @@ class TestListModels:
             mock_urlopen.return_value.__enter__.return_value = mock_response
 
             models = provider.list_models()
-            print(models)
 
             assert isinstance(models, list)
             assert len(models) == len(sample_models_json_data.get("data"))

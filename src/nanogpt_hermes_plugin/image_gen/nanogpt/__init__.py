@@ -5,6 +5,7 @@ API documentation: https://docs.nano-gpt.com/api-reference/image-generation
 import json
 import logging
 import os
+from functools import cache
 from typing import Dict, Any, List, Optional
 
 from agent.image_gen_provider import ImageGenProvider, DEFAULT_ASPECT_RATIO
@@ -106,6 +107,9 @@ class NanoGPTImageGenProvider(ImageGenProvider):
         return [
             {
                 "id": model.get("id"),
+                "display": model.get("name", model.get("id")),
+                "strengths": model.get("description", "Unknown"),
+                "price": f"{self.__get_average_price_or_none(model)} USD (average)" if self.__get_average_price_or_none(model) else "Unknown",
             } for model in models
         ]
 
@@ -129,16 +133,28 @@ class NanoGPTImageGenProvider(ImageGenProvider):
         return super().capabilities()
 
     def generate(
-        self,
-        prompt: str,
-        aspect_ratio: str = DEFAULT_ASPECT_RATIO,
-        *,
-        image_url: Optional[str] = None,
-        reference_image_urls: Optional[List[str]] = None,
-        **kwargs: Any,
+            self,
+            prompt: str,
+            aspect_ratio: str = DEFAULT_ASPECT_RATIO,
+            *,
+            image_url: Optional[str] = None,
+            reference_image_urls: Optional[List[str]] = None,
+            **kwargs: Any,
     ) -> Dict[str, Any]:
         pass
 
+    @staticmethod
+    @cache
+    def __get_average_price_or_none(model: Dict[str, Any]) -> Optional[float]:
+        pricing = model.get("pricing", None)
+        per_image = None if not pricing else pricing.get("per_image", None)
+
+        if not pricing or not per_image:
+            return None
+
+        prices = [float(price) for price in per_image.values()]
+
+        return sum(prices) / len(prices)
 
 # -----------------
 # Plugin entrypoint

@@ -19,6 +19,7 @@ build-backend = "uv_build"
 dev = [
     "hermes-agent==0.17.0",
     "pytest==9.1.1",
+    "ruff==0.15.20",
 ]
 
 [pytest]
