@@ -8,9 +8,6 @@ authors = [
 requires-python = ">=3.11"
 dependencies = []
 
-[tool.setuptools.packages.find]
-where = ["src"]
-
 [project.entry-points."hermes_agent.plugins"]
 nanogpt-model-provider = "nanogpt_hermes_plugin.model_provider.nanogpt"
 nanogpt-image-gen = "nanogpt_hermes_plugin.image_gen.nanogpt"
