@@ -22,7 +22,8 @@ from nanogpt_hermes_plugin.image_gen.nanogpt.builder import (
 )
 from nanogpt_hermes_plugin.image_gen.nanogpt.client import (
     generate_image_img2img,
-    generate_image_txt2img, list_image_models,
+    generate_image_txt2img,
+    list_image_models,
 )
 from nanogpt_hermes_plugin.image_gen.nanogpt.dto import (
     GenerationResponseFormat,
@@ -114,7 +115,9 @@ def _resolve_nanogpt_model() -> str:
         return env_override_model
 
     config = _load_image_gen_config()
-    nanogpt_config = config.get("nanogpt") if isinstance(config.get("nanogpt"), dict) else {}
+    nanogpt_config = (
+        config.get("nanogpt") if isinstance(config.get("nanogpt"), dict) else {}
+    )
     candidate_model: Optional[str] = None
 
     if isinstance(nanogpt_config, dict):
@@ -156,8 +159,9 @@ class NanoGPTImageGenProvider(ImageGenProvider):
                 "id": model.get("id"),
                 "display": model.get("name", model.get("id")),
                 "strengths": model.get("description", "Unknown"),
-                "price": f"{self.__get_average_price_or_none(model)} USD (average)"
-                if self.__get_average_price_or_none(model)
+                "price": f"{average_price} USD (average)"
+                if (average_price := self.__get_average_price_or_none(model))
+                is not None
                 else "Unknown",
             }
             for model in models
@@ -185,9 +189,7 @@ class NanoGPTImageGenProvider(ImageGenProvider):
 
         for model in models:
             if model.get("id") == current_model:
-                return {
-                    "modalities": model.get("architecture").get("input_modalities")
-                }
+                return {"modalities": model.get("architecture").get("input_modalities")}
 
         return super().capabilities()
 
