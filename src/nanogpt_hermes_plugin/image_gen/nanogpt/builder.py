@@ -1,6 +1,9 @@
-from typing import Dict, Optional, List, Any
+from typing import Any, Dict, List, Optional
 
-from nanogpt_hermes_plugin.image_gen.nanogpt.dto import ResponseFormat, ImageGenerationRequestDTO
+from nanogpt_hermes_plugin.image_gen.nanogpt.dto import (
+    GenerationResponseFormat,
+    ImageGenerationRequestDTO,
+)
 
 
 class ImageGenerationRequestBuilder:
@@ -10,7 +13,9 @@ class ImageGenerationRequestBuilder:
         self._model: str = "hidream"
         self._n: int = 1
         self._size: Optional[str] = None
-        self._response_format: ResponseFormat = ResponseFormat.B64_JSON
+        self._response_format: GenerationResponseFormat = (
+            GenerationResponseFormat.B64_JSON
+        )
         self._user: Optional[str] = None
         self._image_data_url: Optional[str] = None
         self._image_data_urls: Optional[List[str]] = None
@@ -41,7 +46,7 @@ class ImageGenerationRequestBuilder:
         return self
 
     def with_response_format(
-        self, response_format: ResponseFormat
+        self, response_format: GenerationResponseFormat
     ) -> "ImageGenerationRequestBuilder":
         self._response_format = response_format
         return self
@@ -72,11 +77,15 @@ class ImageGenerationRequestBuilder:
         self._strength = strength
         return self
 
-    def with_guidance_scale(self, guidance_scale: Optional[int]) -> "ImageGenerationRequestBuilder":
+    def with_guidance_scale(
+        self, guidance_scale: Optional[int]
+    ) -> "ImageGenerationRequestBuilder":
         self._guidance_scale = guidance_scale
         return self
 
-    def with_num_inference_steps(self, num_inference_steps: Optional[int]) -> "ImageGenerationRequestBuilder":
+    def with_num_inference_steps(
+        self, num_inference_steps: Optional[int]
+    ) -> "ImageGenerationRequestBuilder":
         self._num_inference_steps = num_inference_steps
         return self
 
@@ -90,7 +99,9 @@ class ImageGenerationRequestBuilder:
         self._kontext_max_mode = kontext_max_mode
         return self
 
-    def set_custom_parameter(self, key: str, value: Any) -> "ImageGenerationRequestBuilder":
+    def set_custom_parameter(
+        self, key: str, value: Any
+    ) -> "ImageGenerationRequestBuilder":
         self._extra_params[key] = value
         return self
 

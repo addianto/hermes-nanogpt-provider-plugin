@@ -2,15 +2,34 @@
 
 API documentation: https://docs.nano-gpt.com/api-reference/image-generation
 """
+
 import json
 import logging
 import os
 from functools import cache
-from typing import Dict, Any, List, Optional
+from typing import Any, Dict, List, Optional
 from urllib.request import Request, urlopen
 
-from agent.image_gen_provider import ImageGenProvider, DEFAULT_ASPECT_RATIO, error_response, resolve_aspect_ratio, \
-    success_response
+from agent.image_gen_provider import (
+    DEFAULT_ASPECT_RATIO,
+    ImageGenProvider,
+    error_response,
+    resolve_aspect_ratio,
+    save_b64_image,
+    save_url_image,
+    success_response,
+)
+
+from nanogpt_hermes_plugin.image_gen.nanogpt.builder import (
+    ImageGenerationRequestBuilder,
+)
+from nanogpt_hermes_plugin.image_gen.nanogpt.client import (
+    generate_image_img2img,
+    generate_image_txt2img,
+)
+from nanogpt_hermes_plugin.image_gen.nanogpt.dto import (
+    GenerationResponseFormat,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -76,6 +95,7 @@ _DEFAULT_MODEL = "hidream"
 # Configuration
 # -------------
 
+
 def _load_nanogpt_config() -> Dict[str, Any]:
     """Read NanoGPT configuration section from config.yaml."""
     try:
@@ -86,9 +106,9 @@ def _load_nanogpt_config() -> Dict[str, Any]:
 
         return section
     except Exception as exception:
-        # TODO: Does debug level appropriate in this exception handling?
         logger.debug("Failed to load NanoGPT config: %s", exception)
         return {}
+
 
 def _resolve_nanogpt_model() -> str:
     env_override_model = os.environ.get("NANOGPT_IMAGE_MODEL")
@@ -113,9 +133,11 @@ def _resolve_nanogpt_model() -> str:
 
     return _DEFAULT_MODEL
 
+
 # --------
 # Provider
 # --------
+
 
 class NanoGPTImageGenProvider(ImageGenProvider):
     @property
@@ -149,8 +171,11 @@ class NanoGPTImageGenProvider(ImageGenProvider):
                 "id": model.get("id"),
                 "display": model.get("name", model.get("id")),
                 "strengths": model.get("description", "Unknown"),
-                "price": f"{self.__get_average_price_or_none(model)} USD (average)" if self.__get_average_price_or_none(model) else "Unknown",
-            } for model in models
+                "price": f"{self.__get_average_price_or_none(model)} USD (average)"
+                if self.__get_average_price_or_none(model)
+                else "Unknown",
+            }
+            for model in models
         ]
 
     def get_setup_schema(self) -> Dict[str, Any]:
@@ -177,13 +202,13 @@ class NanoGPTImageGenProvider(ImageGenProvider):
         return super().capabilities()
 
     def generate(
-            self,
-            prompt: str,
-            aspect_ratio: str = DEFAULT_ASPECT_RATIO,
-            *,
-            image_url: Optional[str] = None,
-            reference_image_urls: Optional[List[str]] = None,
-            **kwargs: Any,
+        self,
+        prompt: str,
+        aspect_ratio: str = DEFAULT_ASPECT_RATIO,
+        *,
+        image_url: Optional[str] = None,
+        reference_image_urls: Optional[List[str]] = None,
+        **kwargs: Any,
     ) -> Dict[str, Any]:
         prompt = (prompt or "").strip()
         aspect = resolve_aspect_ratio(aspect_ratio)
@@ -204,51 +229,38 @@ class NanoGPTImageGenProvider(ImageGenProvider):
                 error_type="auth_required",
                 provider="nanogpt",
                 model=model,
+                prompt=prompt,
                 aspect_ratio=aspect,
             )
 
-        # TODO: Properly handle img2img here. Return error_response for now since we haven't implemented img2img
-        if image_url or reference_image_urls:
-            return self.__handle_img2img()
+        # TODO Build the request payload according to the model capabilities. Right now it is still hardcoded and not dynamic.
+        generation_request_builder = (
+            ImageGenerationRequestBuilder().with_prompt(prompt).with_model(model)
+        )
+        payload = generation_request_builder.build()
 
-        # TODO: Create a builder function/method for composing the payload based on the capabilities of the selected model
-        payload: Dict[str, Any] = {
-            "prompt": prompt,
-            "model": model,
-            "n": 1,
-            "response_format": "b64_json",
-        }
-
-        request: Request = Request(
-            url=f"{BASE_URL}/images/generations",
-            headers={
-                "Authorization": f"Bearer {os.environ.get('NANOGPT_API_KEY')}",
-                "User-Agent": "nanogpt-hermes-plugin",
-                "Content-Type": "application/json",
-            },
-            data=json.dumps(payload).encode("utf-8"),
-            method="POST",
+        # TODO Handle img2img properly. Currently this implementation is only a placeholder and not working.
+        response = (
+            generate_image_txt2img(BASE_URL, os.environ.get("NANOGPT_API_KEY"), payload)
+            if not image_url and not reference_image_urls
+            else generate_image_img2img(
+                BASE_URL, os.environ.get("NANOGPT_API_KEY"), payload
+            )
+        )
+        image_data = response.data[0]
+        saved_image = (
+            save_url_image(image_data.url)
+            if image_data.format == GenerationResponseFormat.URL
+            else save_b64_image(image_data.b64_json)
         )
 
-        with urlopen(request) as response:
-            raw_data = response.read().decode("utf-8")
-            json_data = json.loads(raw_data)
-            generated_images: List = json_data.get("data") if isinstance(json_data, dict) else []
-
         return success_response(
-            image=generated_images[0],
+            image=str(saved_image),
             model=model,
             prompt=prompt,
             aspect_ratio=aspect,
+            provider="nanogpt",
             modality="text",
-            provider="nanogpt",
-        )
-
-    def __handle_img2img(self):
-        return error_response(
-            error="Image-to-image (img2img) not yet implemented",
-            error_type="not_implemented",
-            provider="nanogpt",
         )
 
     @staticmethod
@@ -264,9 +276,11 @@ class NanoGPTImageGenProvider(ImageGenProvider):
 
         return sum(prices) / len(prices)
 
+
 # -----------------
 # Plugin entrypoint
 # -----------------
+
 
 def register(ctx) -> None:
     ctx.register_image_gen_provider(NanoGPTImageGenProvider())

@@ -1,9 +1,9 @@
-from dataclasses import dataclass, asdict, field
+from dataclasses import asdict, dataclass, field
 from enum import Enum
-from typing import Optional, List, Dict, Any
+from typing import Any, Dict, List, Optional
 
 
-class ResponseFormat(str, Enum):
+class GenerationResponseFormat(str, Enum):
     B64_JSON = "b64_json"
     URL = "url"
 
@@ -13,6 +13,14 @@ class GeneratedImageItemDTO:
     b64_json: Optional[str] = None
     url: Optional[str] = None
 
+    @property
+    def format(self) -> GenerationResponseFormat:
+        return (
+            GenerationResponseFormat.URL
+            if self.url
+            else GenerationResponseFormat.B64_JSON
+        )
+
 
 @dataclass(frozen=True)
 class ImageGenerationRequestDTO:
@@ -21,7 +29,7 @@ class ImageGenerationRequestDTO:
     model: str = "hidream"
     n: int = 1
     size: Optional[str] = None
-    response_format: ResponseFormat = ResponseFormat.B64_JSON
+    response_format: GenerationResponseFormat = GenerationResponseFormat.B64_JSON
     user: Optional[str] = None
 
     # Image inputs (img2img/inpainting)
@@ -40,7 +48,11 @@ class ImageGenerationRequestDTO:
     extra_params: Dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
-        raw_dict = { k: v for k, v in asdict(self).items() if v is not None and k != "extra_params" }
+        raw_dict = {
+            k: v
+            for k, v in asdict(self).items()
+            if v is not None and k != "extra_params"
+        }
         camel_case_mappings = {
             "image_data_url": "imageDataUrl",
             "image_data_urls": "imageDataUrls",
@@ -57,6 +69,7 @@ class ImageGenerationRequestDTO:
 
         return final_dict
 
+
 @dataclass(frozen=True)
 class ImageGenerationResponseDTO:
     created: int
@@ -65,17 +78,17 @@ class ImageGenerationResponseDTO:
     payment_source: str
     remaining_balance: int
 
-    @staticmethod
+    @classmethod
     def from_dict(cls, data: dict) -> "ImageGenerationResponseDTO":
         return cls(
             created=data.get("created"),
             data=[
                 GeneratedImageItemDTO(
-                    b64_json=item.get("b64_json"),
-                    url=item.get("url")
-                ) for item in data.get("data", [])
+                    b64_json=item.get("b64_json"), url=item.get("url")
+                )
+                for item in data.get("data", [])
             ],
             cost=data.get("cost"),
             payment_source=data.get("paymentSource"),
-            remaining_balance=data.get("remainingBalance")
+            remaining_balance=data.get("remainingBalance"),
         )
