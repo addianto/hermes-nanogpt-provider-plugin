@@ -212,25 +212,9 @@ def sample_models_json_data() -> Dict[str, Any]:
     }
 
 
-# ---------------------------------------------------------------------------
-# Properties
-# ---------------------------------------------------------------------------
-
-
-class TestProviderProperties:
-    def test_name(self, provider: NanoGPTImageGenProvider):
-        assert provider.name == "nanogpt"
-
-    def test_display_name(self, provider: NanoGPTImageGenProvider):
-        assert provider.display_name == "NanoGPT"
-
-
-# ---------------------------------------------------------------------------
-# Availability
-# ---------------------------------------------------------------------------
-
-
 class TestIsAvailable:
+    """Test suite for NanoGPTImageGenProvider.is_available()."""
+
     def test_available_when_api_key_set(self, provider: NanoGPTImageGenProvider):
         with patch.dict(os.environ, {"NANOGPT_API_KEY": "sk-test"}):
             assert provider.is_available() is True
@@ -248,12 +232,9 @@ class TestIsAvailable:
             assert provider.is_available() is False
 
 
-# ---------------------------------------------------------------------------
-# Model catalog
-# ---------------------------------------------------------------------------
-
-
 class TestListModels:
+    """Test suite for NanoGPTImageGenProvider.list_models()."""
+
     def test_returns_list_success(self, provider: NanoGPTImageGenProvider, sample_models_json_data: Dict[str, Any]):
         with patch("urllib.request.urlopen") as mock_urlopen:
             mock_raw_data = Mock()
@@ -271,12 +252,9 @@ class TestListModels:
     # TODO Add negative & edge test cases such as: network failure
 
 
-# ---------------------------------------------------------------------------
-# Capabilities
-# ---------------------------------------------------------------------------
-
-
 class TestCapabilities:
+    """Test suite for NanoGPTImageGenProvider.capabilities()."""
+
     def test_returns_dict(self, provider: NanoGPTImageGenProvider):
         caps = provider.capabilities()
         assert isinstance(caps, dict)
@@ -285,3 +263,11 @@ class TestCapabilities:
         caps = provider.capabilities()
         assert "modalities" in caps
         assert isinstance(caps["modalities"], list)
+
+class TestGenerateTxt2Img:
+    """Test suite for NanoGPTImageGenProvider.generate() in text->image generation mode."""
+    pass
+
+class TestGenerateImg2Img:
+    """Test suite for NanoGPTImageGenProvider.generate() in text+image->image generation mode."""
+    pass

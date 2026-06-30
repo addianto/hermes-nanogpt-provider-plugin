@@ -70,7 +70,7 @@ _MODELS: Dict[str, Dict[str, Any]] = {
     },
 }
 
-_DEFAULT_MODEL = "chroma"
+_DEFAULT_MODEL = "hidream"
 
 # -------------
 # Configuration
