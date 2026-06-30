@@ -3,12 +3,9 @@
 API documentation: https://docs.nano-gpt.com/api-reference/image-generation
 """
 
-import json
 import logging
 import os
-from functools import cache
 from typing import Any, Dict, List, Optional
-from urllib.request import Request, urlopen
 
 from agent.image_gen_provider import (
     DEFAULT_ASPECT_RATIO,
@@ -25,7 +22,7 @@ from nanogpt_hermes_plugin.image_gen.nanogpt.builder import (
 )
 from nanogpt_hermes_plugin.image_gen.nanogpt.client import (
     generate_image_img2img,
-    generate_image_txt2img,
+    generate_image_txt2img, list_image_models,
 )
 from nanogpt_hermes_plugin.image_gen.nanogpt.dto import (
     GenerationResponseFormat,
@@ -152,19 +149,7 @@ class NanoGPTImageGenProvider(ImageGenProvider):
         return bool(os.environ.get("NANOGPT_API_KEY", False))
 
     def list_models(self) -> List[Dict[str, Any]]:
-        request: Request = Request(
-            url=f"{BASE_URL}/image-models?detailed=true",
-            headers={
-                "User-Agent": "nanogpt-hermes-plugin",
-                "Content-Type": "application/json",
-            },
-            method="GET",
-        )
-
-        with urlopen(request) as response:
-            raw_data = response.read().decode("utf-8")
-            json_data = json.loads(raw_data)
-            models = json_data.get("data") if isinstance(json_data, dict) else None
+        models = list_image_models(BASE_URL)
 
         return [
             {
@@ -264,7 +249,6 @@ class NanoGPTImageGenProvider(ImageGenProvider):
         )
 
     @staticmethod
-    @cache
     def __get_average_price_or_none(model: Dict[str, Any]) -> Optional[float]:
         pricing = model.get("pricing", None)
         per_image = None if not pricing else pricing.get("per_image", None)
