@@ -8,6 +8,8 @@ class GenerationResponseFormat(str, Enum):
     URL = "url"
 
 
+# TODO Create request & response DTO for list models endpoint
+
 @dataclass(frozen=True)
 class GeneratedImageItemDTO:
     b64_json: Optional[str] = None

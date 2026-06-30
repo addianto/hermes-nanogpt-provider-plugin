@@ -114,15 +114,10 @@ def _resolve_nanogpt_model() -> str:
         return env_override_model
 
     config = _load_nanogpt_config()
-    nanogpt_config = config.get("nanogpt") if isinstance(config, dict) else {}
     candidate_model: Optional[str] = None
 
-    if nanogpt_config:
-        model = nanogpt_config.get("model")
-        candidate_model = model if isinstance(model, str) else None
-
-    if candidate_model is None:
-        model = config.get("model") if isinstance(config, dict) else {}
+    if isinstance(config, dict) and len(config) != 0:
+        model = config.get("model")
         candidate_model = model if isinstance(model, str) else None
 
     if candidate_model is not None:
@@ -180,9 +175,14 @@ class NanoGPTImageGenProvider(ImageGenProvider):
         return _DEFAULT_MODEL
 
     def capabilities(self) -> Dict[str, Any]:
-        model = _resolve_nanogpt_model()
+        models = list_image_models(BASE_URL)
+        current_model = _resolve_nanogpt_model()
 
-        # TODO Use image endpoint query (https://docs.nano-gpt.com/api-reference/endpoint/image-api-model-endpoints)
+        for model in models:
+            if model.get("id") == current_model:
+                return {
+                    "modalities": model.get("architecture").get("input_modalities")
+                }
 
         return super().capabilities()
 
