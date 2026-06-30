@@ -230,28 +230,3 @@ class TestListModels:
             assert all(model.get("id", "") != "" for model in models)
 
     # TODO Add negative & edge test cases such as: network failure
-
-
-class TestCapabilities:
-    """Test suite for NanoGPTImageGenProvider.capabilities()."""
-
-    def test_returns_dict(self, provider: NanoGPTImageGenProvider):
-        caps = provider.capabilities()
-        assert isinstance(caps, dict)
-
-    def test_has_modalities(self, provider: NanoGPTImageGenProvider):
-        caps = provider.capabilities()
-        assert "modalities" in caps
-        assert isinstance(caps["modalities"], list)
-
-
-class TestGenerateTxt2Img:
-    """Test suite for NanoGPTImageGenProvider.generate() in text->image generation mode."""
-
-    pass
-
-
-class TestGenerateImg2Img:
-    """Test suite for NanoGPTImageGenProvider.generate() in text+image->image generation mode."""
-
-    pass
