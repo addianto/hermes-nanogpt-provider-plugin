@@ -254,18 +254,7 @@ class TestIsAvailable:
 
 
 class TestListModels:
-    def test_returns_list(self, provider: NanoGPTImageGenProvider, sample_models_json_data: Dict[str, Any]):
-        """
-        The expected Dict structure for each element in the returned list:
-        {
-            "id": "gpt-image-1.5",               # required
-            "display": "GPT Image 1.5",          # optional; defaults to id
-            "speed": "~10s",                     # optional
-            "strengths": "...",                  # optional
-            "price": "$...",                     # optional
-        }
-        """
-
+    def test_returns_list_success(self, provider: NanoGPTImageGenProvider, sample_models_json_data: Dict[str, Any]):
         with patch("urllib.request.urlopen") as mock_urlopen:
             mock_raw_data = Mock()
             mock_raw_data.decode.return_value = json.dumps(sample_models_json_data)
@@ -278,6 +267,8 @@ class TestListModels:
             assert isinstance(models, list)
             assert len(models) == len(sample_models_json_data.get("data"))
             assert all(model.get("id", "") != "" for model in models)
+
+    # TODO Add negative & edge test cases such as: network failure
 
 
 # ---------------------------------------------------------------------------

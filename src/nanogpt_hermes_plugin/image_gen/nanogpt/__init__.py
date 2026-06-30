@@ -7,8 +7,10 @@ import logging
 import os
 from functools import cache
 from typing import Dict, Any, List, Optional
+from urllib.request import Request, urlopen
 
-from agent.image_gen_provider import ImageGenProvider, DEFAULT_ASPECT_RATIO
+from agent.image_gen_provider import ImageGenProvider, DEFAULT_ASPECT_RATIO, error_response, resolve_aspect_ratio, \
+    success_response
 
 logger = logging.getLogger(__name__)
 
@@ -70,10 +72,50 @@ _MODELS: Dict[str, Dict[str, Any]] = {
 
 _DEFAULT_MODEL = "chroma"
 
+# -------------
+# Configuration
+# -------------
+
+def _load_nanogpt_config() -> Dict[str, Any]:
+    """Read NanoGPT configuration section from config.yaml."""
+    try:
+        from hermes_cli.config import load_config
+
+        config = load_config()
+        section = config.get("nanogpt") if isinstance(config, dict) else {}
+
+        return section
+    except Exception as exception:
+        # TODO: Does debug level appropriate in this exception handling?
+        logger.debug("Failed to load NanoGPT config: %s", exception)
+        return {}
+
+def _resolve_nanogpt_model() -> str:
+    env_override_model = os.environ.get("NANOGPT_IMAGE_MODEL")
+
+    if env_override_model:
+        return env_override_model
+
+    config = _load_nanogpt_config()
+    nanogpt_config = config.get("nanogpt") if isinstance(config, dict) else {}
+    candidate_model: Optional[str] = None
+
+    if nanogpt_config:
+        model = nanogpt_config.get("model")
+        candidate_model = model if isinstance(model, str) else None
+
+    if candidate_model is None:
+        model = config.get("model") if isinstance(config, dict) else {}
+        candidate_model = model if isinstance(model, str) else None
+
+    if candidate_model is not None:
+        return candidate_model
+
+    return _DEFAULT_MODEL
+
 # --------
 # Provider
 # --------
-
 
 class NanoGPTImageGenProvider(ImageGenProvider):
     @property
@@ -88,8 +130,6 @@ class NanoGPTImageGenProvider(ImageGenProvider):
         return bool(os.environ.get("NANOGPT_API_KEY", False))
 
     def list_models(self) -> List[Dict[str, Any]]:
-        from urllib.request import Request, urlopen
-
         request: Request = Request(
             url=f"{BASE_URL}/image-models?detailed=true",
             headers={
@@ -130,6 +170,10 @@ class NanoGPTImageGenProvider(ImageGenProvider):
         return _DEFAULT_MODEL
 
     def capabilities(self) -> Dict[str, Any]:
+        model = _resolve_nanogpt_model()
+
+        # TODO Use image endpoint query (https://docs.nano-gpt.com/api-reference/endpoint/image-api-model-endpoints)
+
         return super().capabilities()
 
     def generate(
@@ -141,7 +185,71 @@ class NanoGPTImageGenProvider(ImageGenProvider):
             reference_image_urls: Optional[List[str]] = None,
             **kwargs: Any,
     ) -> Dict[str, Any]:
-        pass
+        prompt = (prompt or "").strip()
+        aspect = resolve_aspect_ratio(aspect_ratio)
+        model = _resolve_nanogpt_model()
+
+        if not prompt:
+            return error_response(
+                error="Prompt is required and must be a non-empty string",
+                error_type="invalid_argument",
+                provider="nanogpt",
+                model=model,
+                aspect_ratio=aspect,
+            )
+
+        if not os.environ.get("NANOGPT_API_KEY"):
+            return error_response(
+                error="NANOGPT_API_KEY is not set",
+                error_type="auth_required",
+                provider="nanogpt",
+                model=model,
+                aspect_ratio=aspect,
+            )
+
+        # TODO: Properly handle img2img here. Return error_response for now since we haven't implemented img2img
+        if image_url or reference_image_urls:
+            return self.__handle_img2img()
+
+        # TODO: Create a builder function/method for composing the payload based on the capabilities of the selected model
+        payload: Dict[str, Any] = {
+            "prompt": prompt,
+            "model": model,
+            "n": 1,
+            "response_format": "b64_json",
+        }
+
+        request: Request = Request(
+            url=f"{BASE_URL}/images/generations",
+            headers={
+                "Authorization": f"Bearer {os.environ.get('NANOGPT_API_KEY')}",
+                "User-Agent": "nanogpt-hermes-plugin",
+                "Content-Type": "application/json",
+            },
+            data=json.dumps(payload).encode("utf-8"),
+            method="POST",
+        )
+
+        with urlopen(request) as response:
+            raw_data = response.read().decode("utf-8")
+            json_data = json.loads(raw_data)
+            generated_images: List = json_data.get("data") if isinstance(json_data, dict) else []
+
+        return success_response(
+            image=generated_images[0],
+            model=model,
+            prompt=prompt,
+            aspect_ratio=aspect,
+            modality="text",
+            provider="nanogpt",
+        )
+
+    def __handle_img2img(self):
+        return error_response(
+            error="Image-to-image (img2img) not yet implemented",
+            error_type="not_implemented",
+            provider="nanogpt",
+        )
 
     @staticmethod
     @cache
@@ -159,7 +267,6 @@ class NanoGPTImageGenProvider(ImageGenProvider):
 # -----------------
 # Plugin entrypoint
 # -----------------
-
 
 def register(ctx) -> None:
     ctx.register_image_gen_provider(NanoGPTImageGenProvider())
