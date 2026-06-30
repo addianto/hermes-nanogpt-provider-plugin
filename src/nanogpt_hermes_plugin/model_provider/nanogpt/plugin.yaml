@@ -1,0 +1,7 @@
+name: nanogpt-provider
+version: 0.1.0
+description: "NanoGPT model provider"
+author: Daya Adianto
+kind: model-provider
+requires_env:
+  - NANOGPT_API_KEY

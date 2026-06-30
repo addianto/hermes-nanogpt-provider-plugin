@@ -1,0 +1,27 @@
+[project]
+name = "nanogpt-hermes-plugin"
+version = "0.1.0"
+description = "Add your description here"
+authors = [
+    { name = "Daya Adianto", email = "addianto@users.noreply.github.com" }
+]
+requires-python = ">=3.11"
+dependencies = []
+
+[project.entry-points."hermes_agent.plugins"]
+nanogpt-model-provider = "nanogpt_hermes_plugin.model_provider.nanogpt"
+nanogpt-image-gen = "nanogpt_hermes_plugin.image_gen.nanogpt"
+
+[build-system]
+requires = ["uv_build>=0.11.20,<0.12.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "hermes-agent>=0.17.0",
+    "pytest==9.1.1",
+    "ruff==0.15.20",
+]
+
+[pytest]
+addopts = ["--import-mode=importlib"]
