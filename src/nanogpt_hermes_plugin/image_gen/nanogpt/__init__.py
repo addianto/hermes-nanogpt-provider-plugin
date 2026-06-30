@@ -93,17 +93,17 @@ _DEFAULT_MODEL = "hidream"
 # -------------
 
 
-def _load_nanogpt_config() -> Dict[str, Any]:
-    """Read NanoGPT configuration section from config.yaml."""
+def _load_image_gen_config() -> Dict[str, Any]:
+    """Read image_gen configuration section from config.yaml."""
     try:
         from hermes_cli.config import load_config
 
         config = load_config()
-        section = config.get("nanogpt") if isinstance(config, dict) else {}
+        image_gen_config = config.get("image_gen") if isinstance(config, dict) else None
 
-        return section
+        return image_gen_config
     except Exception as exception:
-        logger.debug("Failed to load NanoGPT config: %s", exception)
+        logger.debug("Could not load image_gen config section: %s", exception)
         return {}
 
 
@@ -113,12 +113,17 @@ def _resolve_nanogpt_model() -> str:
     if env_override_model:
         return env_override_model
 
-    config = _load_nanogpt_config()
+    config = _load_image_gen_config()
+    nanogpt_config = config.get("nanogpt") if isinstance(config.get("nanogpt"), dict) else {}
     candidate_model: Optional[str] = None
 
-    if isinstance(config, dict) and len(config) != 0:
-        model = config.get("model")
+    if isinstance(nanogpt_config, dict):
+        model = nanogpt_config.get("model")
         candidate_model = model if isinstance(model, str) else None
+
+    if candidate_model is None:
+        top_level_model = config.get("model")
+        candidate_model = top_level_model if isinstance(top_level_model, str) else None
 
     if candidate_model is not None:
         return candidate_model
