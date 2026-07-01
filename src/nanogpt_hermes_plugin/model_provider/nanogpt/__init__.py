@@ -11,13 +11,13 @@ nanogpt_model_provider = ProviderProfile(
     env_vars=("NANOGPT_API_KEY",),
     base_url="https://nano-gpt.com/api/v1",
     auth_type="api_key",
-    default_aux_model="hermes-medium",
-
+    default_aux_model="xiaomi/mimo-v2.5",
+    fallback_models=(
+        "ibm-granite/granite-4.1-8b",
+        "nvidia/nemotron-3-super-120b-a12b",
+        "deepseek/deepseek-v4-flash",
+        "hermes-medium",
+    ),
 )
-
-# -----------------
-# Plugin entrypoint
-# -----------------
-
 
 register_provider(nanogpt_model_provider)
