@@ -11,4 +11,6 @@ nanogpt_model_provider = ProviderProfile(
     base_url="https://nano-gpt.com/api/v1",
 )
 
-register_provider(nanogpt_model_provider)
+
+def register(ctx) -> None:
+    register_provider(nanogpt_model_provider)

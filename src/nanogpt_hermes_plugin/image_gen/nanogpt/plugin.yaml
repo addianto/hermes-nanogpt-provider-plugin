@@ -4,4 +4,7 @@ description: "NanoGPT image generation backend. Text-to-image (implemented) and 
 author: Daya Adianto
 kind: backend
 requires_env:
-  - NANOGPT_API_KEY
+  - name: NANOGPT_API_KEY
+    description: "NanoGPT API key"
+    url: https://nano-gpt.com/api
+    secret: true
