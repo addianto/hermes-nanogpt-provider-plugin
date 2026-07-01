@@ -4,4 +4,7 @@ description: "NanoGPT model provider"
 author: Daya Adianto
 kind: model-provider
 requires_env:
-  - NANOGPT_API_KEY
+  - name: NANOGPT_API_KEY
+    description: "NanoGPT API key"
+    url: https://nano-gpt.com/api
+    secret: true
