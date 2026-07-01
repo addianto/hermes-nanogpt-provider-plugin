@@ -1,7 +1,7 @@
 [project]
 name = "nanogpt-hermes-plugin"
-version = "0.1.0"
-description = "Add your description here"
+version = "0.1.1"
+description = "Hermes Agent plugin for NanoGPT provider."
 authors = [
     { name = "Daya Adianto", email = "addianto@users.noreply.github.com" }
 ]
@@ -9,7 +9,7 @@ requires-python = ">=3.11"
 dependencies = []
 
 [project.entry-points."hermes_agent.plugins"]
-nanogpt-model-provider = "src.nanogpt_hermes_plugin.model_provider.nanogpt"
+nanogpt-provider = "nanogpt_hermes_plugin.model_provider.nanogpt:register"
 nanogpt-image-gen = "nanogpt_hermes_plugin.image_gen.nanogpt:register"
 
 [build-system]

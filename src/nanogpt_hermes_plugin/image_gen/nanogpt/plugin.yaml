@@ -1,4 +1,4 @@
-name: nanogpt
+name: nanogpt-image-gen
 version: 0.1.0
 description: "NanoGPT image generation backend. Text-to-image (implemented) and image-to-image (not yet implemented). Saves generated images to $HERMES_HOME/cache/images/."
 author: Daya Adianto
