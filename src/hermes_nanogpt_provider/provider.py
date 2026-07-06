@@ -1,8 +1,8 @@
 import logging
-import os
 from enum import Enum
 from typing import Optional
 
+from hermes_cli.config import get_env_value
 from providers import ProviderProfile
 
 logger = logging.getLogger(__name__)
@@ -53,7 +53,7 @@ nanogpt_model_provider = ProviderProfile(
     base_url=BASE_URL,
     # TODO Fix/implement personalized models endpoint
     models_url=_resolve_model_list_endpoint(
-        os.environ.get("NANOGPT_MODEL_LIST_ENDPOINT")
+        get_env_value("NANOGPT_MODEL_LIST_ENDPOINT")
     ),
     supports_vision=True,
     fallback_models=(
