@@ -14,14 +14,18 @@ I simply want to follow the plugin system as its intended: to extend the origina
 
 ## Setup
 
-Add `providers` section in `config.yaml` with `nanogpt`-specific properties to resolve unknown model warning:
+1. Clone this repository to `$HERMES_HOME/plugins/model-providers`
+2. Add `providers` section in `config.yaml` with `nanogpt`-specific properties to resolve unknown model warning:
+   ```yaml
+   providers:
+     nanogpt:
+       api_key: NANOGPT_API_KEY
+       base_url: https://nano-gpt.com/api/v1
+   ```
 
-```yaml
-providers:
-  nanogpt:
-    api_key: NANOGPT_API_KEY
-    base_url: https://nano-gpt.com/api/v1
-```
+## Acknowledgements
+
+I followed the repository structure of [`mssteuer/lossless-hermes-py`](https://github.com/mssteuer/lossless-hermes-py).
 
 ## License
 
