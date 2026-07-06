@@ -1,10 +1,13 @@
 """NanoGPT provider."""
 
+import logging
 import os
 from enum import Enum
 from typing import Optional
 
 from providers import ProviderProfile, register_provider
+
+logger = logging.getLogger(__name__)
 
 BASE_URL = "https://nano-gpt.com/api/v1"
 
@@ -21,28 +24,36 @@ DEFAULT_MODEL_ENDPOINT = ModelListEndpoint.CANONICAL
 
 def _resolve_model_list_endpoint(option: Optional[str]) -> ModelListEndpoint:
     if option is None:
+        logger.info("nanogpt: empty model list option was provided")
         return DEFAULT_MODEL_ENDPOINT
 
-    if option.lower() == "canonical":
-        return ModelListEndpoint.CANONICAL
-    if option.lower() == "personalized":
-        return ModelListEndpoint.PERSONALIZED
-    if option.lower() == "subscriptiononly":
-        return ModelListEndpoint.SUBSCRIPTION_ONLY
-    if option.lower() == "paidonly":
-        return ModelListEndpoint.PAID_ONLY
+    resolved_endpoint = DEFAULT_MODEL_ENDPOINT
 
-    return DEFAULT_MODEL_ENDPOINT
+    if option.lower() == "canonical":
+        resolved_endpoint = ModelListEndpoint.CANONICAL
+    if option.lower() == "personalized":
+        resolved_endpoint = ModelListEndpoint.PERSONALIZED
+    if option.lower() == "subscription":
+        resolved_endpoint = ModelListEndpoint.SUBSCRIPTION_ONLY
+    if option.lower() == "paid":
+        resolved_endpoint = ModelListEndpoint.PAID_ONLY
+
+    logger.info(
+        f"nanogpt: resolved model list option '{option}' to '{resolved_endpoint}'"
+    )
+
+    return resolved_endpoint
 
 
 nanogpt_model_provider = ProviderProfile(
     name="nanogpt",
     aliases=("nanogpt",),
     display_name="NanoGPT",
-    description="NanoGPT is a pay-as-you-go, OpenAI-compatible AI platform that provides routing to frontier models and open-source models.",
+    description="NanoGPT (pay-as-you-go, OpenAI-compatible AI platform)",
     signup_url="https://nano-gpt.com",
     env_vars=("NANOGPT_API_KEY",),
     base_url=BASE_URL,
+    # TODO Fix/implement personalized models endpoint
     models_url=_resolve_model_list_endpoint(
         os.environ.get("NANOGPT_MODEL_LIST_ENDPOINT")
     ),
@@ -52,6 +63,4 @@ nanogpt_model_provider = ProviderProfile(
     ),
 )
 
-
-def register() -> None:
-    register_provider(nanogpt_model_provider)
+register_provider(nanogpt_model_provider)
