@@ -11,7 +11,7 @@ BASE_URL = "https://nano-gpt.com/api/v1"
 class ModelListEndpoint(str, Enum):
     CANONICAL = f"{BASE_URL}/models"
     PERSONALIZED = f"{BASE_URL[:BASE_URL.rfind('/')]}/personalized/v1/models"
-    SUBSCRIPTION_ONLY = f"{BASE_URL[:BASE_URL.rfind('/')]}/subscriptions/v1/models"
+    SUBSCRIPTION_ONLY = f"{BASE_URL[:BASE_URL.rfind('/')]}/subscription/v1/models"
     PAID_ONLY = f"{BASE_URL[:BASE_URL.rfind('/')]}/paid/v1/models"
 
 
