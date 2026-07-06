@@ -66,6 +66,3 @@ nanogpt_model_provider = ProviderProfile(
 
 def register() -> None:
     register_provider(nanogpt_model_provider)
-
-
-register_provider(nanogpt_model_provider)
