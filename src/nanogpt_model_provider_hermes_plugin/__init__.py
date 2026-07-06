@@ -41,7 +41,10 @@ nanogpt_model_provider = ProviderProfile(
     env_vars=("NANOGPT_API_KEY",),
     base_url=BASE_URL,
     models_url=_resolve_model_list_endpoint(os.environ.get("NANOGPT_MODEL_LIST_ENDPOINT")),
-    default_aux_model="xiaomi/mimo-v2.5:thinking",
+    supports_vision=True,
+    fallback_models=(
+        "hermes-medium", # Included in subscription; Suitable for agent work according to NanoGPT's documentation
+    ),
 )
 
 
