@@ -9,7 +9,7 @@ requires-python = ">=3.11"
 dependencies = []
 
 [project.entry-points."hermes_agent.plugins"]
-nanogpt-provider = "hermes_nanogpt_provider"
+nanogpt-provider = "hermes_nanogpt_provider:register"
 
 [build-system]
 requires = ["uv_build>=0.11.20,<0.12.0"]
