@@ -15,9 +15,9 @@ def register(_ctx: PluginContext = None) -> None:
         sys.path.insert(0, src_dir)
         logger.debug(f"nanogpt: appended src_dir to sys.path: {sys.path}")
 
-        from hermes_nanogpt_provider import register as nanogpt_register
+    from hermes_nanogpt_provider import register as nanogpt_register
 
-        nanogpt_register(_ctx)
+    nanogpt_register(_ctx)
 
 
 register()

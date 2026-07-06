@@ -11,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 def register(_ctx: PluginContext = None) -> None:
+    logger.debug("nanogpt: registering provider")
     register_provider(nanogpt_model_provider)
 
 
