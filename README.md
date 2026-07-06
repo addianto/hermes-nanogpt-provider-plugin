@@ -22,3 +22,7 @@ providers:
     api_key: NANOGPT_API_KEY
     base_url: https://nano-gpt.com/api/v1
 ```
+
+## License
+
+[MIT](./LICENSE).
