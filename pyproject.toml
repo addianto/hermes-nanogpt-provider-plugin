@@ -1,7 +1,7 @@
 [project]
-name = "nanogpt-hermes-plugin"
-version = "0.1.1"
-description = "Hermes Agent plugin for NanoGPT provider."
+name = "nanogpt-model-provider-hermes-plugin"
+version = "0.2.0"
+description = "Hermes Agent plugin for NanoGPT as model provider."
 authors = [
     { name = "Daya Adianto", email = "addianto@users.noreply.github.com" }
 ]
