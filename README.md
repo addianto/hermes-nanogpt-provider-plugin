@@ -23,6 +23,10 @@ providers:
     base_url: https://nano-gpt.com/api/v1
 ```
 
+## Acknowledgements
+
+I followed the repository structure of [`mssteuer/lossless-hermes-py`](https://github.com/mssteuer/lossless-hermes-py).
+
 ## License
 
 [MIT](./LICENSE).

@@ -1,11 +1,9 @@
-"""NanoGPT provider."""
-
 import logging
 import os
 from enum import Enum
 from typing import Optional
 
-from providers import ProviderProfile, register_provider
+from providers import ProviderProfile
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +22,7 @@ DEFAULT_MODEL_ENDPOINT = ModelListEndpoint.CANONICAL
 
 def _resolve_model_list_endpoint(option: Optional[str]) -> ModelListEndpoint:
     if option is None:
-        logger.info("nanogpt: empty model list option was provided")
+        logger.debug("nanogpt: empty model list option was provided")
         return DEFAULT_MODEL_ENDPOINT
 
     resolved_endpoint = DEFAULT_MODEL_ENDPOINT
@@ -38,7 +36,7 @@ def _resolve_model_list_endpoint(option: Optional[str]) -> ModelListEndpoint:
     if option.lower() == "paid":
         resolved_endpoint = ModelListEndpoint.PAID_ONLY
 
-    logger.info(
+    logger.debug(
         f"nanogpt: resolved model list option '{option}' to '{resolved_endpoint}'"
     )
 
@@ -63,9 +61,4 @@ nanogpt_model_provider = ProviderProfile(
     ),
 )
 
-
-def register() -> None:
-    register_provider(nanogpt_model_provider)
-
-
-register_provider(nanogpt_model_provider)
+__all__ = ["nanogpt_model_provider", "ModelListEndpoint"]

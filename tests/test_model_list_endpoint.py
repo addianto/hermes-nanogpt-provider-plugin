@@ -1,4 +1,4 @@
-from nanogpt_model_provider_hermes_plugin import ModelListEndpoint
+from hermes_nanogpt_provider import ModelListEndpoint
 
 
 def test_model_list_endpoint_values():
