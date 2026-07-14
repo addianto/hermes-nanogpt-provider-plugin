@@ -17,6 +17,13 @@ class ModelListEndpoint(str, Enum):
     PAID_ONLY = f"{BASE_URL[: BASE_URL.rfind('/')]}/paid/v1/models"
 
 
+ENDPOINT_MAP = {
+    "canonical": ModelListEndpoint.CANONICAL,
+    "personalized": ModelListEndpoint.PERSONALIZED,
+    "subscription": ModelListEndpoint.SUBSCRIPTION_ONLY,
+    "paid": ModelListEndpoint.PAID_ONLY,
+}
+
 DEFAULT_MODEL_ENDPOINT = ModelListEndpoint.CANONICAL
 
 
@@ -25,22 +32,15 @@ def _resolve_model_list_endpoint(option: Optional[str]) -> ModelListEndpoint:
         logger.debug("nanogpt: empty model list option was provided")
         return DEFAULT_MODEL_ENDPOINT
 
-    resolved_endpoint = DEFAULT_MODEL_ENDPOINT
+    if option.lower() in ENDPOINT_MAP:
+        logger.debug(
+            f"nanogpt: resolved model list option '{option}' to '{ENDPOINT_MAP[option.lower()]}'"
+        )
+        return ENDPOINT_MAP[option.lower()]
 
-    if option.lower() == "canonical":
-        resolved_endpoint = ModelListEndpoint.CANONICAL
-    if option.lower() == "personalized":
-        resolved_endpoint = ModelListEndpoint.PERSONALIZED
-    if option.lower() == "subscription":
-        resolved_endpoint = ModelListEndpoint.SUBSCRIPTION_ONLY
-    if option.lower() == "paid":
-        resolved_endpoint = ModelListEndpoint.PAID_ONLY
+    logger.warning(f"nanogpt: unrecognized model list option '{option}'")
 
-    logger.debug(
-        f"nanogpt: resolved model list option '{option}' to '{resolved_endpoint}'"
-    )
-
-    return resolved_endpoint
+    return DEFAULT_MODEL_ENDPOINT
 
 
 nanogpt_model_provider = ProviderProfile(
@@ -49,7 +49,10 @@ nanogpt_model_provider = ProviderProfile(
     display_name="NanoGPT",
     description="NanoGPT (pay-as-you-go, OpenAI-compatible AI platform)",
     signup_url="https://nano-gpt.com",
-    env_vars=("NANOGPT_API_KEY",),
+    env_vars=(
+        "NANOGPT_API_KEY",
+        "NANOGPT_MODEL_LIST_ENDPOINT",
+    ),
     base_url=BASE_URL,
     # TODO Fix/implement personalized models endpoint
     models_url=_resolve_model_list_endpoint(

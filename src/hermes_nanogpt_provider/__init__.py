@@ -15,5 +15,5 @@ def register(_ctx: PluginContext = None) -> None:
     register_provider(nanogpt_model_provider)
 
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 __all__ = ["register", "ModelListEndpoint"]

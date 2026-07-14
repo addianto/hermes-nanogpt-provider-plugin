@@ -1,6 +1,6 @@
 ---
 name: nanogpt-provider
-version: 0.3.0
+version: 0.4.0
 description: "NanoGPT model provider"
 author: Daya Adianto
 kind: model-provider
@@ -9,3 +9,7 @@ requires_env:
     description: "NanoGPT API key"
     url: https://nano-gpt.com/api
     secret: true
+  - name: NANOGPT_MODEL_LIST_ENDPOINT
+    description: "NanoGPT model list endpoint (canonical, personalized, subscription, paid). Optional, defaults to canonical."
+    secret: false
+
