@@ -10,9 +10,9 @@ I know the plugin is very simple to implement directly in Hermes Agent since Nan
 It could be as simple as creating an instance of `ProviderProfile` that points to the NanoGPT's API.
 
 However, I avoid making changes directly in the upstream Hermes Agent codebase.
-I don't want to add more code to maintain and review for the maintainers,
-even though I know some of the maintainers are automated as AI agents.
-_(citation needed, but that's the impression I get from skimming the issues and pull requests)_
+I don't want to add more code for the maintainers to maintain and review,
+although I know most of the development is automated using AI agents.
+_(citation needed, but that's the impression I get from skimming the issues and pull requests)._
 I simply want to create and run a plugin as intended: to extend the original software without making direct changes to it.
 
 ## Setup (Manual)
@@ -22,6 +22,8 @@ I simply want to create and run a plugin as intended: to extend the original sof
    mkdir -p $HERMES_HOME/plugins/model-providers
    git clone <repository URL> $HERMES_HOME/plugins/model-providers/nanogpt
    ```
+   
+   > Note: `$HERMES_HOME` can be a path to your default Hermes Agent installation or a path to a Hermes Agent profile.
 2. Add the `providers` section in `config.yaml` with `nanogpt`-specific properties to resolve unknown model warning. 
    At minimum, add these to `config.yaml`:
    ```yaml
@@ -30,14 +32,23 @@ I simply want to create and run a plugin as intended: to extend the original sof
        api_key: NANOGPT_API_KEY
        base_url: https://nano-gpt.com/api/v1
    ```
-3. Configure Hermes Agent to use NanoGPT as model provider, either using `hermes model` from the shell or `/model` command from Hermes' TUI.
+3. Configure Hermes Agent to use NanoGPT as model provider, either using `hermes model` from the shell 
+   or `/model` command from Hermes Agent's TUI.
 
 ## Setup (Python Package)
 
-_Note: untested_
+> Note: untested.
 
 According to the Hermes Agent documentation, it should be as simple as `pip install <plugin's package name on PyPI>`.
 I haven't tested it nor set up the publishing account on PyPI.
+
+## Configuration
+
+Add the following environment variables to your Hermes Agent's `.env` located at `$HERMES_HOME/.env`:
+
+- `NANOGPT_API_KEY` (mandatory): NanoGPT API key. Get it from https://nano-gpt.com/api.
+- `NANOGPT_MODEL_LIST_ENDPOINT` (optional): NanoGPT model list endpoint. Four possible values:
+  `canonical`, `personalized`, `subscription`, `paid`. Defaults to `canonical` if not set.
 
 ## Acknowledgements
 
