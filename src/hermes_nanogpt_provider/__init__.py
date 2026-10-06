@@ -10,7 +10,7 @@ from hermes_nanogpt_provider.provider import ModelListEndpoint, nanogpt_model_pr
 logger = logging.getLogger(__name__)
 
 
-def register(_ctx: PluginContext = None) -> None:
+def register(_ctx: PluginContext | None = None) -> None:
     logger.debug("nanogpt: registering provider")
     register_provider(nanogpt_model_provider)
 
