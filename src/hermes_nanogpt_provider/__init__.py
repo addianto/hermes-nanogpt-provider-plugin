@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """NanoGPT model provider."""
 
 import logging
@@ -15,5 +16,5 @@ def register(_ctx: PluginContext | None = None) -> None:
     register_provider(nanogpt_model_provider)
 
 
-__version__ = "0.4.0"
+__version__ = "0.4.1"
 __all__ = ["register", "ModelListEndpoint"]

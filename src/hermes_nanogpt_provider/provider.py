@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 import logging
 from enum import Enum
 from typing import Optional
