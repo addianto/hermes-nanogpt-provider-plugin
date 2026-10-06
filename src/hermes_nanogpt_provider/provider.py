@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 import logging
 from enum import Enum
 from typing import Optional
@@ -54,7 +55,6 @@ nanogpt_model_provider = ProviderProfile(
         "NANOGPT_MODEL_LIST_ENDPOINT",
     ),
     base_url=BASE_URL,
-    # TODO Fix/implement personalized models endpoint
     models_url=_resolve_model_list_endpoint(
         get_env_value("NANOGPT_MODEL_LIST_ENDPOINT")
     ),

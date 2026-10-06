@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: MIT
+"""NanoGPT model provider plugin entrypoint."""
+
 import logging
 import sys
 from pathlib import Path
@@ -7,7 +10,7 @@ from hermes_cli.plugins import PluginContext
 logger = logging.getLogger(__name__)
 
 
-def register(_ctx: PluginContext = None) -> None:
+def register(_ctx: PluginContext | None = None) -> None:
     src_dir = str(Path(__file__).parent / "src")
     logger.debug(f"nanogpt: src_dir: {src_dir}")
 
