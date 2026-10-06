@@ -5,21 +5,19 @@ from unittest.mock import patch
 
 import pytest
 
-from hermes_nanogpt_provider import ModelListEndpoint
-
 
 @pytest.mark.parametrize(
     "option,expected_url",
     [
-        ("canonical", ModelListEndpoint.CANONICAL.value),
-        ("personalized", ModelListEndpoint.PERSONALIZED.value),
-        ("subscription", ModelListEndpoint.SUBSCRIPTION_ONLY.value),
-        ("paid", ModelListEndpoint.PAID_ONLY.value),
-        ("CANONICAL", ModelListEndpoint.CANONICAL.value),
-        ("PERSONALIZED", ModelListEndpoint.PERSONALIZED.value),
-        ("SUBSCRIPTION", ModelListEndpoint.SUBSCRIPTION_ONLY.value),
-        ("PAID", ModelListEndpoint.PAID_ONLY.value),
-        (None, ModelListEndpoint.CANONICAL.value),
+        ("canonical", "https://nano-gpt.com/api/v1/models"),
+        ("personalized", "https://nano-gpt.com/api/personalized/v1/models"),
+        ("subscription", "https://nano-gpt.com/api/subscription/v1/models"),
+        ("paid", "https://nano-gpt.com/api/paid/v1/models"),
+        ("CANONICAL", "https://nano-gpt.com/api/v1/models"),
+        ("PERSONALIZED", "https://nano-gpt.com/api/personalized/v1/models"),
+        ("SUBSCRIPTION", "https://nano-gpt.com/api/subscription/v1/models"),
+        ("PAID", "https://nano-gpt.com/api/paid/v1/models"),
+        (None, "https://nano-gpt.com/api/v1/models"),
     ],
 )
 def test_provider_resolves_correct_endpoint(
@@ -41,7 +39,7 @@ def test_provider_resolves_invalid_endpoint_to_default(caplog) -> None:
         with caplog.at_level(logging.WARNING):
             importlib.reload(hermes_nanogpt_provider.provider)
             provider = hermes_nanogpt_provider.provider.nanogpt_model_provider
-            assert provider.models_url == ModelListEndpoint.CANONICAL.value
+            assert provider.models_url == "https://nano-gpt.com/api/v1/models"
             assert any(
                 "nanogpt: unrecognized model list option 'invalid'" in record.message
                 for record in caplog.records
