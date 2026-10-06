@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MIT
 """NanoGPT model provider plugin entrypoint."""
+
 import logging
 import sys
 from pathlib import Path
