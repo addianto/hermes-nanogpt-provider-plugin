@@ -64,4 +64,4 @@ nanogpt_model_provider = ProviderProfile(
     ),
 )
 
-__all__ = ["nanogpt_model_provider", "ModelListEndpoint"]
+__all__ = ["nanogpt_model_provider"]

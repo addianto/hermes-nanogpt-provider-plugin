@@ -6,7 +6,7 @@ import logging
 from hermes_cli.plugins import PluginContext
 from providers import register_provider
 
-from hermes_nanogpt_provider.provider import ModelListEndpoint, nanogpt_model_provider
+from hermes_nanogpt_provider.provider import nanogpt_model_provider
 
 logger = logging.getLogger(__name__)
 
@@ -17,4 +17,4 @@ def register(_ctx: PluginContext | None = None) -> None:
 
 
 __version__ = "0.4.2"
-__all__ = ["register", "ModelListEndpoint"]
+__all__ = ["register"]
