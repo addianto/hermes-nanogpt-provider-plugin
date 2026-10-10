@@ -1,6 +1,6 @@
 [project]
 name = "hermes-nanogpt-provider"
-version = "0.4.3"
+version = "0.4.4"
 description = "Hermes Agent plugin for NanoGPT as model provider."
 readme = "README.md"
 license = "MIT"
@@ -28,7 +28,7 @@ Repository = "https://github.com/addianto/hermes-nanogpt-provider"
 Issues = "https://github.com/addianto/hermes-nanogpt-provider/issues"
 
 [project.entry-points."hermes_agent.plugins"]
-nanogpt-provider = "hermes_nanogpt_provider"
+nanogpt-provider = "hermes_nanogpt_provider:register"
 
 [build-system]
 requires = ["uv_build>=0.12.23,<0.13"]
