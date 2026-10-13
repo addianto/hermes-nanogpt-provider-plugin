@@ -27,9 +27,9 @@ classifiers = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/addianto/hermes-nanogpt-provider"
-Repository = "https://github.com/addianto/hermes-nanogpt-provider"
-Issues = "https://github.com/addianto/hermes-nanogpt-provider/issues"
+Homepage = "https://github.com/addianto/hermes-nanogpt-provider-plugin"
+Repository = "https://github.com/addianto/hermes-nanogpt-provider-plugin"
+Issues = "https://github.com/addianto/hermes-nanogpt-provider-plugin/issues"
 
 [project.entry-points."hermes_agent.plugins"]
 nanogpt-provider = "hermes_nanogpt_provider:register"
