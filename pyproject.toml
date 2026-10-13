@@ -4,7 +4,7 @@ version = "0.4.4"
 description = "Hermes Agent plugin for NanoGPT as model provider."
 readme = "README.md"
 license = "MIT"
-license-files = ["LICENSE"]
+license-files = ["LICEN[CS]E*"]
 requires-python = ">=3.11"
 authors = [
     { name = "Daya Adianto", email = "addianto@users.noreply.github.com" },
@@ -18,8 +18,12 @@ keywords = [
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
+    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
 ]
 
 [project.urls]
