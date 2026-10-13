@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/addianto/hermes-nanogpt-provider-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/addianto/hermes-nanogpt-provider-plugin/actions/workflows/ci.yml)
 
-This is a plugin that lets Hermes Agent to use NanoGPT as a model provider.
+This is a plugin that lets Hermes Agent use NanoGPT as a model provider.
 
 ## Why?
 
@@ -33,7 +33,7 @@ hermes plugins enable nanogpt-provider
 
 ## Installation (via PyPI)
 
-Locate where your Hermes Agent's Python virtual environment:
+Locate your Hermes Agent's Python virtual environment:
 
 ```shell
 hermes pm env

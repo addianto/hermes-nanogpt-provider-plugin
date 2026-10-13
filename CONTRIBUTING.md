@@ -18,7 +18,7 @@ uv sync --all-groups
 
 ## Working on the Codebase
 
-Make sure to run linters and ensure tests pass for every changes:
+Make sure to run linters and ensure tests pass for every change:
 
 ```shell
 uv run ruff check
