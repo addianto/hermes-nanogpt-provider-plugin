@@ -1,27 +1,41 @@
 [project]
 name = "hermes-nanogpt-provider"
-version = "0.4.2"
+version = "0.4.4"
 description = "Hermes Agent plugin for NanoGPT as model provider."
-authors = [
-    { name = "Daya Adianto", email = "addianto@users.noreply.github.com" }
-]
-maintainers = [
-    { name = "Daya Adianto", email = "addianto@users.noreply.github.com" }
-]
-requires-python = ">=3.11"
 readme = "README.md"
 license = "MIT"
-license-files = ["LICENSE"]
-classifiers = [
-    "Development Status :: 3 - Alpha",
-    "Programming Language :: Python :: 3.11"
+license-files = ["LICEN[CS]E*"]
+requires-python = ">=3.11"
+authors = [
+    { name = "Daya Adianto", email = "addianto@users.noreply.github.com" },
 ]
+maintainers = [
+    { name = "Daya Adianto", email = "addianto@users.noreply.github.com" },
+]
+keywords = [
+    "hermes-agent",
+    "nanogpt",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+
+[project.urls]
+Homepage = "https://github.com/addianto/hermes-nanogpt-provider-plugin"
+Repository = "https://github.com/addianto/hermes-nanogpt-provider-plugin"
+Issues = "https://github.com/addianto/hermes-nanogpt-provider-plugin/issues"
 
 [project.entry-points."hermes_agent.plugins"]
 nanogpt-provider = "hermes_nanogpt_provider:register"
 
 [build-system]
-requires = ["uv_build>=0.11.20,<0.12.0"]
+requires = ["uv_build>=0.12.23,<0.13"]
 build-backend = "uv_build"
 
 [dependency-groups]
