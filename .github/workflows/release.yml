@@ -29,6 +29,6 @@ jobs:
       - name: Publish package to PyPI
         uses: pypa/gh-action-pypi-publish@v1.14.2
         with:
-          attestations: true
+          # No need to generate the attestations because they already included from the staging workflow
+          attestations: false
           packages-dir: dist/
-          print-hash: true
