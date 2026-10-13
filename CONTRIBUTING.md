@@ -1,6 +1,4 @@
-# Contributing to Hermes NanoGPT Provider Plugin
-
-Thank you for your interest in contributing! This document outlines local development procedures and the project's release lifecycle.
+# How to Contribute
 
 ## Local Development Setup
 
