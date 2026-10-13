@@ -16,5 +16,5 @@ def register(_ctx: PluginContext | None = None) -> None:
     register_provider(nanogpt_model_provider)
 
 
-__version__ = "0.4.4"
+__version__ = "0.4.5"
 __all__ = ["register"]

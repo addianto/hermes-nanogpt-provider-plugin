@@ -1,6 +1,6 @@
 [project]
 name = "hermes-nanogpt-provider"
-version = "0.4.4"
+version = "0.4.5"
 description = "Hermes Agent plugin for NanoGPT as model provider."
 readme = "README.md"
 license = "MIT"

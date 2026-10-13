@@ -1,0 +1,55 @@
+---
+name: TestPyPI
+
+on:
+  push:
+    tags: [ v* ]
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  staging:
+    name: Staging
+    runs-on: ubuntu-24.04
+    environment:
+      name: testpypi
+      url: https://test.pypi.org/p/hermes-nanogpt-provider
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@v7.0.0
+        with:
+          python-version-file: ".python-version"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.2.0
+        with:
+          enable-cache: "auto"
+
+      - name: Build package distributions
+        run: uv build
+
+      - name: Check package metadata & README
+        run: uvx twine check --strict dist/*
+
+      - name: Publish package to TestPyPI
+        uses: pypa/gh-action-pypi-publish@v1.14.2
+        with:
+          attestations: true
+          packages-dir: dist/
+          print-hash: true
+          repository-url: https://test.pypi.org/legacy/
+
+      - name: Create draft GitHub Release
+        run: |
+          gh release create "${{ github.ref_name }}" dist/* \
+            --draft \
+            --title "Release ${{ github.ref_name }}" \
+            --generate-notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
