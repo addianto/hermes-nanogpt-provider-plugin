@@ -1,65 +1,34 @@
 ---
-name: Publish to TestPyPI
+name: PyPI
 
 on:
-  push:
-    tags: [ v* ]
-  workflow_dispatch:
+  release:
+    types: [ published ]
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
-  build:
-    name: Build
+  release:
+    name: Release
     runs-on: ubuntu-24.04
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v7.0.1
-
-      - name: Set up Python
-        uses: actions/setup-python@v7.0.0
-        with:
-          python-version-file: ".python-version"
-
-      - name: Install uv
-        uses: astral-sh/setup-uv@v10.2.0
-        with:
-          enable-cache: "auto"
-
-      - name: Build package distributions
-        run: uv build
-
-      - name: Store distribution artifacts
-        uses: actions/upload-artifact@v7.0.2
-        with:
-          name: distribution
-          path: dist/
-          if-no-files-found: error
-
-  publish:
-    name: Publish to TestPyPI
-    needs: build
-    runs-on: ubuntu-24.04
-
     environment:
-      name: testpypi
-      url: https://test.pypi.org/p/hermes-nanogpt-provider
-
-    permissions:
-      id-token: write
+      name: pypi
+      url: https://pypi.org/p/hermes-nanogpt-provider
 
     steps:
-      - name: Download distribution artifacts
-        uses: actions/download-artifact@v8.0.2
-        with:
-          name: distribution
-          path: dist/
+      - name: Download release assets
+        run: |
+          gh release download "${{ github.event.release.tag_name }}" \
+            --repo "${{ github.repository }}" \
+            --dir dist/
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Publish package to TestPyPI
+      - name: Publish package to PyPI
         uses: pypa/gh-action-pypi-publish@v1.14.2
         with:
           attestations: true
           packages-dir: dist/
           print-hash: true
-          repository-url: https://test.pypi.org/legacy/
