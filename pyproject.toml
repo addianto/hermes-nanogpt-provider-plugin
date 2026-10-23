@@ -40,7 +40,7 @@ build-backend = "uv_build"
 
 [dependency-groups]
 dev = [
-    "hermes-agent>=0.19.0",
+    # Note: hermes-agent dependency is declared separately at requirements-dev.txt to avoid plugin installation failure on more recent Hermes Agent version (v0.22.2).
     "pytest==9.1.1",
     "pytest-cov==7.1.0",
     "ruff==0.17.2",
