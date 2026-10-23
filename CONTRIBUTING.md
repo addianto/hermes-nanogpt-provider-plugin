@@ -13,7 +13,8 @@ Then, clone the fork into your local development machine and install dependencie
 ```shell
 git clone <your fork> hermes-nanogpt-provider-plugin
 cd hermes-nanogpt-provider-plugin
-uv sync --all-groups
+uv sync --inexact
+uv pip install -r requirements-dev.txt
 ```
 
 ## Working on the Codebase
