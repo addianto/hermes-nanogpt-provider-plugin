@@ -38,13 +38,5 @@ nanogpt-provider = "hermes_nanogpt_provider:register"
 requires = ["uv_build>=0.13.5,<0.14"]
 build-backend = "uv_build"
 
-[dependency-groups]
-dev = [
-    # Note: hermes-agent dependency is declared separately at requirements-dev.txt to avoid plugin installation failure on more recent Hermes Agent version (e.g., v0.22.2).
-    "pytest==9.1.1",
-    "pytest-cov==7.1.0",
-    "ruff==0.17.2",
-]
-
 [pytest]
 addopts = ["--import-mode=importlib"]
