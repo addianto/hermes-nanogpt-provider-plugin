@@ -43,3 +43,26 @@ jobs:
 
       - name: Run Pytest and measure coverage
         run: uv run pytest --cov=src --cov-report=term-missing
+
+  integration-test:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        hermes-version: ["v0.22.2", "latest"]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7.0.1
+
+      - name: Check if manual plugin installation works in Hermes Agent container
+        run: |
+          docker run --rm --entrypoint /bin/bash \
+            -v "$PWD":/workspace:ro \
+            docker.io/nousresearch/hermes-agent:${{ matrix.hermes-version }} \
+            -c '
+              set -euo pipefail
+              mkdir -p /opt/data/plugins/nanogpt-provider
+              cp -r /workspace/* /opt/data/plugins/nanogpt-provider/
+              hermes plugins enable nanogpt-probider
+              hermes plugins list
+            '
