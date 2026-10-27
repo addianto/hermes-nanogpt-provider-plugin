@@ -30,7 +30,9 @@ jobs:
           prune-cache: "true"
 
       - name: Install dev dependencies
-        run: uv pip install -r requirements-dev.txt
+        run: |
+          uv venv
+          uv pip install -r requirements-dev.txt
 
       - name: Run Ruff check
         run: uv run ruff check
@@ -62,5 +64,5 @@ jobs:
               mkdir -p /opt/data/plugins/nanogpt-provider
               cp -r /workspace/* /opt/data/plugins/nanogpt-provider/
               hermes plugins enable nanogpt-provider
-              hermes plugins list
+              hermes plugins list --plain --no-bundled
             '
