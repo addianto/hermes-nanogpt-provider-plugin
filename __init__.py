@@ -1,3 +1,4 @@
+# noqa: N999 Avoid lint issue when the repo is cloned as-is from GitHub to a directory with kebab-style name.
 # SPDX-License-Identifier: MIT
 """NanoGPT model provider plugin entrypoint."""
 
