@@ -45,6 +45,7 @@ jobs:
         run: uv run pytest --cov=src --cov-report=term-missing
 
   integration-test:
+    name: Integration Test
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
@@ -63,6 +64,6 @@ jobs:
               set -euo pipefail
               mkdir -p /opt/data/plugins/nanogpt-provider
               cp -r /workspace/* /opt/data/plugins/nanogpt-provider/
-              hermes plugins enable nanogpt-probider
+              hermes plugins enable nanogpt-provider
               hermes plugins list
             '
