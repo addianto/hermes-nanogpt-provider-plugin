@@ -1,7 +1,6 @@
 # SPDX-License-Identifier: MIT
 import logging
 from enum import Enum
-from typing import Optional
 
 from hermes_cli.config import get_env_value
 from providers import ProviderProfile
@@ -28,7 +27,7 @@ ENDPOINT_MAP = {
 DEFAULT_MODEL_ENDPOINT = ModelListEndpoint.CANONICAL
 
 
-def _resolve_model_list_endpoint(option: Optional[str]) -> ModelListEndpoint:
+def _resolve_model_list_endpoint(option: str | None) -> ModelListEndpoint:
     if option is None:
         logger.debug("nanogpt: empty model list option was provided")
         return DEFAULT_MODEL_ENDPOINT

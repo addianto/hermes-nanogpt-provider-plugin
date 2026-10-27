@@ -1,0 +1,10 @@
+# Note: I know this seems backward by declaring the dev deps in requirements-dev.txt instead of pyproject.toml.
+#       But apparently, the declared dev dependencies in this project's pyproject.toml will conflict with the existing pyproject.toml in Hermes Agent itself.
+
+# v2026.7.20 == v0.19.0 published on PyPI
+hermes-agent @ git+https://github.com/NousResearch/hermes-agent@v2026.7.20
+
+# The actual dev dependencies
+pytest==9.1.1
+pytest-cov==7.1.0
+ruff==0.17.2
