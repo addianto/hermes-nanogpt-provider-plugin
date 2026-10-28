@@ -18,7 +18,6 @@ import pytest
         ("PERSONALIZED", "https://nano-gpt.com/api/personalized/v1/models"),
         ("SUBSCRIPTION", "https://nano-gpt.com/api/subscription/v1/models"),
         ("PAID", "https://nano-gpt.com/api/paid/v1/models"),
-        (None, "https://nano-gpt.com/api/v1/models"),
     ],
 )
 def test_provider_resolves_correct_endpoint(
@@ -31,6 +30,16 @@ def test_provider_resolves_correct_endpoint(
         importlib.reload(hermes_nanogpt_provider.provider)
         provider = hermes_nanogpt_provider.provider.nanogpt_model_provider
         assert provider.models_url == expected_url
+
+
+def test_provder_resolves_default_endpoint_when_option_not_set() -> None:
+    with patch("hermes_cli.config.get_env_value") as mock_get_env_value:
+        mock_get_env_value.side_effect = lambda _: None
+        import hermes_nanogpt_provider.provider
+
+        importlib.reload(hermes_nanogpt_provider.provider)
+        provider = hermes_nanogpt_provider.provider.nanogpt_model_provider
+        assert provider.models_url == "https://nano-gpt.com/api/v1/models"
 
 
 def test_provider_resolves_invalid_endpoint_to_default(caplog) -> None:
