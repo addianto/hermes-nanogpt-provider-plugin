@@ -2,11 +2,15 @@
 name: PyPI
 
 on:
-  release:
-    types: [ published ]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Git tag to publish (e.g., v0.4.7)
+        required: true
+        type: string
 
 permissions:
-  contents: read
+  contents: write
   id-token: write
 
 jobs:
@@ -18,18 +22,42 @@ jobs:
       url: https://pypi.org/p/hermes-nanogpt-provider
 
     steps:
-      # TODO: Build package distribution instead of copying the staging version
-      - name: Download release assets
-        run: |
-          gh release download "${{ github.event.release.tag_name }}" \
-            --repo "${{ github.repository }}" \
-            --dir dist/
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Checkout repository
+        uses: actions/checkout@v7.0.1
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v7.0.0
+        with:
+          python-version-file: ".python-version"
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v10.2.0
+        with:
+          enable-cache: "auto"
+
+      - name: Build package distributions
+        run: uv build
+
+      - name: Check package metadata & README
+        run: uvx twine check --strict dist/*
 
       - name: Publish package to PyPI
         uses: pypa/gh-action-pypi-publish@v1.14.2
         with:
-          # No need to generate the attestations because they already included from the staging workflow
-          attestations: false
+          attestations: true
           packages-dir: dist/
+          print-hash: true
+
+      - name: Upload assets to draft release
+        run: |
+          gh release upload "${{ inputs.tag }}" dist/* --clobber
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish release
+        run: |
+          gh release edit "${{ inputs.tag }}" --draft=false
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
