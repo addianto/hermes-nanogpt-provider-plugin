@@ -32,7 +32,7 @@ def test_provider_resolves_correct_endpoint(
         assert provider.models_url == expected_url
 
 
-def test_provder_resolves_default_endpoint_when_option_not_set() -> None:
+def test_provider_resolves_default_endpoint_when_option_not_set() -> None:
     with patch("hermes_cli.config.get_env_value") as mock_get_env_value:
         mock_get_env_value.side_effect = lambda _: None
         import hermes_nanogpt_provider.provider
