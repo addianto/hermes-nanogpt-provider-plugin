@@ -31,7 +31,9 @@ def _resolve_version() -> str:
             with pyproject_file.open("rb") as file:
                 return tomllib.load(file)["project"]["version"]
         except (OSError, KeyError, tomllib.TOMLDecodeError) as error:
-            logger.exception("nanogpt: Unable to read the pyproject.toml field", exc_info=error)
+            logger.exception(
+                "nanogpt: Unable to read the pyproject.toml field", exc_info=error
+            )
             return "0+unknown"
 
 
