@@ -29,16 +29,18 @@ jobs:
           enable-cache: "auto"
           prune-cache: "true"
 
+      - name: Check stale lockfile
+        run: uv lock --check
+
       - name: Install dev dependencies
         run: |
           uv venv
           uv pip install -r requirements-dev.txt
 
       - name: Run Ruff check
-        run: uv run ruff check
-
-      - name: Run Ruff format check
-        run: uv run ruff format --check
+        run: |
+          uv run ruff check
+          uv run ruff format --check
 
       - name: Run Pytest and measure coverage
         run: uv run pytest --cov=src --cov-report=term-missing
