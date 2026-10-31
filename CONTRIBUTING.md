@@ -56,7 +56,7 @@ git add pyproject.toml plugin.yaml uv.lock
 git commit -m "chore: Bump up project version"
 ```
 
-Then, push the latest branch with latest commit to GitHub and merge it to the main branch by making a pull request.
+Push the latest branch with latest commit to GitHub and merge it to the main branch by making a pull request.
 Once the branch has been merged, update the local main branch and tag the release:
 
 ```shell
@@ -69,8 +69,9 @@ git push origin v1.2.3
 > Note: The version number in the example above is just an example.
 >       Please adjust to the actual version you want to tag and publish.
 
-The CI pipeline will create a draft release notes.
+A GitHub workflow will draft a release note and publish the plugin to Test PyPI for review/staging.
 The draft, by default, contains list of changes since the previous tag up to the new tag.
-You can customise it on GitHub.
-Once the release notes is ready, trigger a workflow by providing the tag name you want to publish.
+You can customise it via the project's GitHub release page.
+
+Once the release notes is ready, trigger a release workflow on GitHUb by providing the tag name you want to publish.
 GitHub will automatically build and publish the plugin to PyPI.
