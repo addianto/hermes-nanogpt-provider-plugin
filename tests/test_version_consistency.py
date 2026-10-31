@@ -2,6 +2,7 @@
 import re
 import tomllib
 from pathlib import Path
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parent.parent
 
@@ -35,5 +36,18 @@ def test_uvlock_and_plugin_versions_match() -> None:
 
 def test_pyproject_version_matches_package_version() -> None:
     import hermes_nanogpt_provider
+
+    assert hermes_nanogpt_provider.__version__ == _pyproject_version()
+
+
+@patch("importlib.metadata.version")
+def test_package_version_matches_pyproject_version_when_installed_manually(
+    mock_version,
+) -> None:
+    from importlib.metadata import PackageNotFoundError
+
+    import hermes_nanogpt_provider
+
+    mock_version.side_effect = PackageNotFoundError
 
     assert hermes_nanogpt_provider.__version__ == _pyproject_version()

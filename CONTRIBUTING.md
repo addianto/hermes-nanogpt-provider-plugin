@@ -37,11 +37,10 @@ You can prepare a new release either when:
 - Preparing the release independently on a separate release branch.
 
 Regardless, update the version at [`pyproject.toml`](./pyproject.toml) and [`plugin.yaml`](./plugin.yaml).
-Then, run `uv sync` and `uv lock` to sync the new version to the auto-generated lockfile.
+Then, run `uv sync` to sync the new version to the auto-generated lockfile.
 
 ```shell
 uv sync --inexact
-uv lock --check
 ```
 
 To be extra sure, run the test suite that verifies version consistency:
@@ -64,6 +63,7 @@ Once the branch has been merged, update the local main branch and tag the releas
 git switch main
 git pull
 git tag -s v1.2.3 -m "Release v1.2.3"
+git push origin v1.2.3
 ```
 
 > Note: The version number in the example above is just an example.

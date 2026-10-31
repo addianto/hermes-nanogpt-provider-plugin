@@ -19,21 +19,18 @@ def _resolve_version() -> str:
 
     try:
         return distribution_version("hermes-nanogpt-provider")
-    except PackageNotFoundError as package_not_found:
-        logger.warning(
+    except PackageNotFoundError:
+        logger.debug(
             "nanogpt: Plugin not installed in a Python environment and is likely installed via clone method directly to a Hermes plugins directory",
-            exc_info=package_not_found,
         )
 
-        pyproject_file = Path(__file__).resolve().parent.parent / "pyproject.toml"
+        pyproject_file = Path(__file__).resolve().parents[2] / "pyproject.toml"
 
         try:
             with pyproject_file.open("rb") as file:
                 return tomllib.load(file)["project"]["version"]
-        except (OSError, KeyError, tomllib.TOMLDecodeError) as error:
-            logger.exception(
-                "nanogpt: Unable to read the pyproject.toml field", exc_info=error
-            )
+        except (OSError, KeyError, tomllib.TOMLDecodeError):
+            logger.exception("nanogpt: Unable to read the pyproject.toml field")
             return "0+unknown"
 
 
