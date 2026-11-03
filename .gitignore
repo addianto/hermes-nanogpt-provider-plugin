@@ -219,3 +219,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Custom files & folders to ignore
+.agents/mcp_config.json
