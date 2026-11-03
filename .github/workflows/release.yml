@@ -52,12 +52,14 @@ jobs:
 
       - name: Upload assets to draft release
         run: |
-          gh release upload "${{ inputs.tag }}" dist/* --clobber
+          gh release upload "$TAG" dist/* --clobber
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ inputs.tag }}
 
       - name: Publish release
         run: |
-          gh release edit "${{ inputs.tag }}" --draft=false
+          gh release edit "$TAG" --draft=false
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ inputs.tag }}
