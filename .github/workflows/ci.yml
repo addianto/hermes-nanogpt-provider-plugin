@@ -35,7 +35,7 @@ jobs:
       - name: Install dev dependencies
         run: |
           uv venv
-          uv pip install --no-build -r requirements-dev.txt
+          uv pip install -r requirements-dev.txt
 
       - name: Run Ruff check
         run: |
