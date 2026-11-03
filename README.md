@@ -1,6 +1,7 @@
 # NanoGPT Model Provider Plugin for Hermes Agent
 
 [![CI](https://github.com/addianto/hermes-nanogpt-provider-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/addianto/hermes-nanogpt-provider-plugin/actions/workflows/ci.yml)
+[![Quality gate status](https://sonarcloud.io/api/project_badges/measure?project=addianto_hermes-nanogpt-provider-plugin&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=addianto_hermes-nanogpt-provider-plugin)
 
 This is a plugin that lets Hermes Agent use NanoGPT as a model provider.
 
