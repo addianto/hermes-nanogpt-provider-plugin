@@ -35,7 +35,7 @@ jobs:
         run: uv build
 
       - name: Check package metadata & README
-        run: uvx twine check --strict dist/*
+        run: uvx --from twine==7.0.0 --no-build twine check --strict dist/*
 
       - name: Publish package to TestPyPI
         uses: pypa/gh-action-pypi-publish@7245906fb61fa33a13554f9d5fb856fe61758086 # v1.14.3
