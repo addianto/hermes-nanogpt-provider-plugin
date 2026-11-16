@@ -39,15 +39,21 @@ jobs:
 
       - name: Run Ruff check
         run: |
-          uv run --no-build --frozen ruff check
-          uv run --no-build --frozen ruff format --check
+          mkdir -p dist
+          uv run --no-build --frozen ruff check \
+            --output-format sarif | tee dist/ruff-check.json
+          uv run --no-build --frozen ruff format --check \
+            --output-format sarif | tee dist/ruff-format.json
 
       - name: Run Pytest and measure coverage
         run: |
           mkdir -p dist
           uv run --no-build --frozen pytest \
             --cov=src --cov-report=term-missing \
-            --junit-xml=dist/junit.xml
+            --junit-xml=dist/junit.xml \
+            --cov-report xml:dist/coverage.xml \
+            --cov-report markdown-append:$GITHUB_STEP_SUMMARY
+      # TODO: Add job to run SonarScanner
 
   integration-test:
     name: Integration Test
