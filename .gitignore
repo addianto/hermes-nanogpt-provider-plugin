@@ -222,3 +222,4 @@ __marimo__/
 
 # Custom files & folders to ignore
 .agents/mcp_config.json
+reports/
