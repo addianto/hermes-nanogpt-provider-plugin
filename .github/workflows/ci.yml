@@ -14,9 +14,13 @@ jobs:
   ci:
     name: Lint & Test
     runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.project-version.outputs.version }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7.0.1
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v7.1.0
@@ -53,7 +57,21 @@ jobs:
             --junit-xml=reports/junit.xml \
             --cov-report xml:reports/coverage.xml \
             --cov-report markdown-append:$GITHUB_STEP_SUMMARY
-      # TODO: Add job to run SonarScanner
+
+      - name: Get project version
+        id: project-version
+        run: |
+          VERSION="$(uv version --short --frozen)"
+          echo "Project version: $VERSION"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Run SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@59202af334b4ba7b5db01b701b8e79f8b3bef0f4 # v8.5.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.projectVersion=${{ steps.project-version.outputs.version }}
 
   integration-test:
     name: Integration Test
