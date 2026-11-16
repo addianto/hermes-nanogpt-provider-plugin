@@ -43,7 +43,11 @@ jobs:
           uv run --no-build --frozen ruff format --check
 
       - name: Run Pytest and measure coverage
-        run: uv run --no-build --frozen pytest --cov=src --cov-report=term-missing
+        run: |
+          mkdir -p dist
+          uv run --no-build --frozen pytest \
+            --cov=src --cov-report=term-missing \
+            --junit-xml=dist/junit.xml
 
   integration-test:
     name: Integration Test
