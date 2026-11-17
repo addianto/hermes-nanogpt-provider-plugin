@@ -42,6 +42,34 @@ def _resolve_model_list_endpoint(option: str | None) -> ModelListEndpoint:
 
     return DEFAULT_MODEL_ENDPOINT
 
+def _hermes_agent_version() -> str:
+    hermes_agent_version: str = ""
+
+    # Newer Hermes Agent version has version_info module that provides version resolver function
+    # The following checker code taken from hermes-ngrok plugin, licensed under MIT
+    try:
+        from hermes_cli.version_info import get_version_info
+
+        hermes_agent_version = get_version_info().base_version
+    # TODO Use more specific exception type that will be thrown when Python failed to import a package
+    except Exception:
+        try:
+            from hermes_cli import __version__ as version
+
+            hermes_agent_version = version
+        except Exception:
+            hermes_agent_version = ""
+
+    hermes_agent_version = str(hermes_agent_version or "").strip()
+
+    return "" if hermes_agent_version in ("unknown", "0.0.0") else hermes_agent_version
+
+def _default_headers() -> dict[str, str]:
+    default_headers: dict[str, str] = {
+        "User-Agent": "hermes-agent",
+    }
+
+    return default_headers
 
 nanogpt_model_provider = ProviderProfile(
     name="nanogpt",
