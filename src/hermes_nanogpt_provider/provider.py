@@ -42,6 +42,7 @@ def _resolve_model_list_endpoint(option: str | None) -> ModelListEndpoint:
 
     return DEFAULT_MODEL_ENDPOINT
 
+
 def _hermes_agent_version() -> str:
     hermes_agent_version: str = ""
 
@@ -63,15 +64,21 @@ def _hermes_agent_version() -> str:
         except ImportError:
             hermes_agent_version = ""
 
-    return hermes_agent_version if hermes_agent_version not in ("unknown", "0.0.0") else ""
+    return (
+        hermes_agent_version if hermes_agent_version not in ("unknown", "0.0.0") else ""
+    )
+
 
 def _default_headers() -> dict[str, str]:
     version = _hermes_agent_version()
     default_headers: dict[str, str] = {
-        "User-Agent": f"hermes-agent/{version} (nanogpt-provider)" if version else "hermes-agent (nanogpt-provider)"
+        "User-Agent": f"hermes-agent/{version} (nanogpt-provider)"
+        if version
+        else "hermes-agent (nanogpt-provider)"
     }
 
     return default_headers
+
 
 nanogpt_model_provider = ProviderProfile(
     name="nanogpt",
