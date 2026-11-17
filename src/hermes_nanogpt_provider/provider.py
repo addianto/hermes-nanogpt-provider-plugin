@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: MIT
 import logging
-from enum import Enum
+from enum import StrEnum
 
 from hermes_cli.config import get_env_value
 from providers import ProviderProfile
@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 BASE_URL = "https://nano-gpt.com/api/v1"
 
 
-class ModelListEndpoint(str, Enum):
+class ModelListEndpoint(StrEnum):
     CANONICAL = f"{BASE_URL}/models"
     PERSONALIZED = f"{BASE_URL[: BASE_URL.rfind('/')]}/personalized/v1/models"
     SUBSCRIPTION_ONLY = f"{BASE_URL[: BASE_URL.rfind('/')]}/subscription/v1/models"
