@@ -46,27 +46,29 @@ def _hermes_agent_version() -> str:
     hermes_agent_version: str = ""
 
     # Newer Hermes Agent version has version_info module that provides version resolver function
-    # The following checker code taken from hermes-ngrok plugin, licensed under MIT
+    # The following checker and resolver code adapted from [hermes-ngrok plugin](https://github.com/ngrok/hermes-ngrok/blob/fe3ed32/model-providers/ngrok/__init__.py),
+    # licensed under MIT
     try:
         from hermes_cli.version_info import get_version_info
+    except ImportError:
+        get_version_info = None
 
+    if get_version_info is not None:
         hermes_agent_version = get_version_info().base_version
-    # TODO Use more specific exception type that will be thrown when Python failed to import a package
-    except Exception:
+    else:
         try:
             from hermes_cli import __version__ as version
 
-            hermes_agent_version = version
-        except Exception:
+            hermes_agent_version = str(version)
+        except ImportError:
             hermes_agent_version = ""
 
-    hermes_agent_version = str(hermes_agent_version or "").strip()
-
-    return "" if hermes_agent_version in ("unknown", "0.0.0") else hermes_agent_version
+    return hermes_agent_version if hermes_agent_version not in ("unknown", "0.0.0") else ""
 
 def _default_headers() -> dict[str, str]:
+    version = _hermes_agent_version()
     default_headers: dict[str, str] = {
-        "User-Agent": "hermes-agent",
+        "User-Agent": f"hermes-agent/{version} (nanogpt-provider)" if version else "hermes-agent (nanogpt-provider)"
     }
 
     return default_headers
@@ -81,6 +83,7 @@ nanogpt_model_provider = ProviderProfile(
         "NANOGPT_API_KEY",
         "NANOGPT_MODEL_LIST_ENDPOINT",
     ),
+    default_headers=_default_headers(),
     base_url=BASE_URL,
     models_url=_resolve_model_list_endpoint(
         get_env_value("NANOGPT_MODEL_LIST_ENDPOINT")
