@@ -11,7 +11,7 @@ from hermes_nanogpt_provider.provider import nanogpt_model_provider
 logger = logging.getLogger(__name__)
 
 
-def _resolve_version() -> str:
+def _resolve_plugin_version() -> str:
     import tomllib
     from importlib.metadata import PackageNotFoundError
     from importlib.metadata import version as distribution_version
@@ -39,5 +39,5 @@ def register(_ctx: PluginContext | None = None) -> None:
     register_provider(nanogpt_model_provider)
 
 
-__version__ = _resolve_version()
+__version__ = _resolve_plugin_version()
 __all__ = ["register"]

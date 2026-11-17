@@ -24,7 +24,7 @@ Use `hermes plugins install` command to install this plugin:
 hermes plugins install addianto/hermes-nanogpt-provider-plugin
 ```
 
-Verify the plugin is installed and recognised by Hermes Agent
+Verify the plugin is installed and recognised by Hermes Agent.
 If you see `nanogpt-provider` listed, enable the plugin:
 
 ```shell

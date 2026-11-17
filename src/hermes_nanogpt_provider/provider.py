@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: MIT
 import logging
-from enum import Enum
+from enum import StrEnum
 
 from hermes_cli.config import get_env_value
 from providers import ProviderProfile
@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 BASE_URL = "https://nano-gpt.com/api/v1"
 
 
-class ModelListEndpoint(str, Enum):
+class ModelListEndpoint(StrEnum):
     CANONICAL = f"{BASE_URL}/models"
     PERSONALIZED = f"{BASE_URL[: BASE_URL.rfind('/')]}/personalized/v1/models"
     SUBSCRIPTION_ONLY = f"{BASE_URL[: BASE_URL.rfind('/')]}/subscription/v1/models"
@@ -43,6 +43,43 @@ def _resolve_model_list_endpoint(option: str | None) -> ModelListEndpoint:
     return DEFAULT_MODEL_ENDPOINT
 
 
+def _hermes_agent_version() -> str:
+    hermes_agent_version: str = ""
+
+    # Newer Hermes Agent version has version_info module that provides version resolver function
+    # The following checker and resolver code adapted from [hermes-ngrok plugin](https://github.com/ngrok/hermes-ngrok/blob/fe3ed32/model-providers/ngrok/__init__.py),
+    # licensed under MIT
+    try:
+        from hermes_cli.version_info import get_version_info
+    except ImportError:
+        get_version_info = None
+
+    if get_version_info is not None:
+        hermes_agent_version = get_version_info().base_version
+    else:
+        try:
+            from hermes_cli import __version__ as version
+
+            hermes_agent_version = str(version)
+        except ImportError:
+            hermes_agent_version = ""
+
+    return (
+        hermes_agent_version if hermes_agent_version not in ("unknown", "0.0.0") else ""
+    )
+
+
+def _default_headers() -> dict[str, str]:
+    version = _hermes_agent_version()
+    default_headers: dict[str, str] = {
+        "User-Agent": f"hermes-agent/{version} (nanogpt-provider)"
+        if version
+        else "hermes-agent (nanogpt-provider)"
+    }
+
+    return default_headers
+
+
 nanogpt_model_provider = ProviderProfile(
     name="nanogpt",
     aliases=("nanogpt",),
@@ -53,6 +90,7 @@ nanogpt_model_provider = ProviderProfile(
         "NANOGPT_API_KEY",
         "NANOGPT_MODEL_LIST_ENDPOINT",
     ),
+    default_headers=_default_headers(),
     base_url=BASE_URL,
     models_url=_resolve_model_list_endpoint(
         get_env_value("NANOGPT_MODEL_LIST_ENDPOINT")
